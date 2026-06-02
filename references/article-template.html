@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章预览</title>
+<style>
+  /* 这个 <style> 仅用于本地预览的手机外壳，不会进入文章。
+     文章内容（ARTICLE HTML 之间）必须全部用内联样式。 */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f0f0f0; display: flex; justify-content: center; padding: 20px;
+         font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+  .phone-frame { width: 375px; background: #fff; border-radius: 24px;
+                 box-shadow: 0 8px 40px rgba(0,0,0,.12); overflow: hidden; }
+  .phone-header { height: 44px; display: flex; align-items: center; justify-content: center;
+                  font-size: 12px; color: #999; border-bottom: 1px solid #f0f0f0; }
+  .copy-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #eee;
+              padding: 12px 16px; display: flex; gap: 8px; }
+  .copy-bar button { flex: 1; padding: 10px; border: none; border-radius: 8px;
+                     font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-copy { background: #1d1d1f; color: #fff; }
+  .btn-top { background: #f5f5f7; color: #1d1d1f; }
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="phone-header">公众号文章预览</div>
+  <div id="article-content">
+
+<!-- ARTICLE HTML START -->
+<section style="margin:0 auto;padding:24px 20px 32px;max-width:677px;background:#fff;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;font-size:15px;line-height:1.8;letter-spacing:0.2px;">
+
+  <!-- 封面卡 -->
+  <section style="margin:0 0 20px;padding:28px 20px;border-radius:14px;background:#111;text-align:center;">
+    <p style="margin:0 0 6px;font-size:11px;line-height:1.6;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:3px;">品牌名 · 栏目</p>
+    <p style="margin:0 0 10px;font-size:20px;line-height:1.4;color:#fff;font-weight:800;">文章主标题</p>
+    <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.55);">一句话副标题</p>
+  </section>
+
+  <!-- 文章用 h1 承载标题（publish.ts 没传 --title 时会取它）；可隐藏 -->
+  <h1 style="display:none;">文章主标题</h1>
+
+  <p style="margin:8px 0;font-size:15px;line-height:1.8;color:#1d1d1f;">开场正文……</p>
+
+  <hr style="margin:24px 0;border:0;border-top:1px solid #eee;" />
+
+  <!-- 编号小标题 -->
+  <section style="display:flex;align-items:center;gap:10px;margin:8px 0 12px;">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#1d1d1f;color:#fff;font-size:13px;font-weight:800;">1</span>
+    <p style="margin:0;font-size:16px;line-height:1.5;color:#1d1d1f;font-weight:700;">第一个小标题</p>
+  </section>
+
+  <p style="margin:8px 0;font-size:15px;line-height:1.8;color:#1d1d1f;">这一节的正文……重点用 <strong>加粗</strong>。</p>
+
+  <!-- 更多组件见 references/components.md -->
+
+  <!-- 文末总结 -->
+  <section style="margin:24px 0 0;padding:18px;border-radius:10px;background:#111;">
+    <p style="margin:0 0 8px;font-size:16px;line-height:1.5;color:#fff;font-weight:700;">写在最后</p>
+    <p style="margin:8px 0;font-size:15px;line-height:1.8;color:rgba(255,255,255,0.8);">收尾……</p>
+  </section>
+
+</section>
+<!-- ARTICLE HTML END -->
+
+  </div>
+  <div class="copy-bar">
+    <button class="btn-copy" onclick="copyArticle()">复制带样式 HTML</button>
+    <button class="btn-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">回到顶部</button>
+  </div>
+</div>
+<script>
+function copyArticle() {
+  const html = document.getElementById('article-content').innerHTML;
+  navigator.clipboard.write([new ClipboardItem({
+    'text/html': new Blob([html], {type: 'text/html'}),
+    'text/plain': new Blob([html], {type: 'text/plain'}),
+  })]).then(() => {
+    const b = document.querySelector('.btn-copy');
+    b.textContent = '已复制 ✓';
+    setTimeout(() => b.textContent = '复制带样式 HTML', 2000);
+  });
+}
+</script>
+</body>
+</html>

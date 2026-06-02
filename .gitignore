@@ -1,0 +1,25 @@
+# 凭证 —— 千万别提交
+.env
+.env.local
+
+# 依赖
+node_modules/
+
+# 构建产物 / 生成的文章
+*.png
+*.jpg
+*.jpeg
+*.gif
+# 例外：保留 README 用到的示例图
+!docs/**/*.png
+!docs/**/*.jpg
+
+# macOS
+.DS_Store
+__MACOSX/
+._*
+
+# 编辑器
+.vscode/
+.idea/
+*.log
