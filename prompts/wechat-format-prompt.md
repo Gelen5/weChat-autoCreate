@@ -60,7 +60,7 @@ Hero 大标题 28px / 900 / 行高 1.05 / 字距 -2px
 
 【配图规则——别贴裂图】
 - 数据/对比/流程/时间线 → 一律用上面的内联 SVG（矢量，复制能带进公众号，最稳）。
-- 照片/插画：① 你若能生成图片，生成后用 base64 内嵌 <img src="data:image/png;base64,...">（复制粘贴时公众号会自动收图）；② 你若拿不到真实图片，【绝不编造图片网址】（会裂图），改放浅灰占位块 + 图注写明建议搜索关键词：
+- 照片/插画：① 能联网就**主动搜一张真实可用的图**（拿到图片直链后下载转 base64 内嵌 <img src="data:image/jpeg;base64,...">，复制粘贴时公众号会自动收图；优先无版权风险图源 Unsplash/Pexels/维基共享）；② 能生成图片的同样用 base64 内嵌；③ 三者都拿不到时，【绝不编造图片网址】（会裂图），改放浅灰占位块 + 图注写明建议搜索关键词：
   <section style="margin:0 20px 24px;"><div style="width:100%;height:160px;border-radius:12px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:12px;">配图位（建议搜：xxx）</div><p style="margin:6px 0 0;font-size:11px;color:#9CA3AF;text-align:center;">图注</p></section>
 - Hero/小节头各用一次即可，全篇别堆太多卡片。忠于原文，不标题党。
 
@@ -109,4 +109,4 @@ function copyWx(){
 1. 同样粘提示词 + 文章，把它给的 HTML 存成 `文章.html` 用浏览器打开。
 2. 在浏览器里点复制按钮（或手动全选复制）→ 粘进公众号编辑器。
 
-> 三个要点：① 复制的是「看到的样子」，不是代码。② SVG 信息图和 base64 图片复制粘贴时都能带进公众号（公众号会自动收图）。③ 纯对话 AI 没法真的「搜」网络图片——给的图片网址多半是假的、会裂图；要全自动搜图/生图并自动上传，用本仓库的 Skill（imagegen.ts + publish.ts），那是进阶玩法。
+> 三个要点：① 复制的是「看到的样子」，不是代码。② SVG 信息图和 base64 图片复制粘贴时都能带进公众号（公众号会自动收图）。③ 纯对话 AI 没法真的「搜」网络图片——给的图片网址多半是假的、会裂图；要**真·联网搜图并内嵌**（搜到直链 → `img2base64.ts` 下载校验压缩转 base64）或自动生图/上传，用本仓库的 Skill，那是进阶玩法。
