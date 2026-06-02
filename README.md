@@ -3,6 +3,8 @@
 > 把一篇文章排版成微信公众号合规的精排 HTML，自动上传图片、可选生成封面，一键写进公众号草稿箱。
 > A Claude skill that typesets articles into WeChat-ready HTML and pushes them straight to your draft box.
 
+> 作者 / Author：**sakuraoxo（喂鱼）**
+
 跟市面上「Markdown 一键转公众号」的工具不一样的地方在于：它不是套一个固定模板，而是让 **AI 照着一套组件库，为你这篇文章的内容现场手写排版**——卡片、编号小标题、深色金句框、还有**内联 SVG 信息图**（对比图、时间线、飞轮，矢量清晰且不占图片配额）。所以同样一篇稿子，出来的不是「文档感」，而是「设计过」。
 
 ---

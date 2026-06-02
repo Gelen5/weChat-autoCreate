@@ -134,3 +134,7 @@ npx tsx publish.ts <文章.md> [--title ..] [--author ..] [--cover <路径> | --
 | `HTML file looks like a full document` | 给文章内容加上 `ARTICLE HTML START/END` 标记 |
 | `Body image too large` | 正文图超 1MB，`sips` 压缩后重试 |
 | `No title found` | 传 `--title` 或在 HTML 里放一个 `<h1>` |
+
+---
+
+> 作者 / Author：**sakuraoxo（喂鱼）** · MIT License
