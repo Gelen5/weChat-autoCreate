@@ -1,0 +1,9 @@
+requests>=2.31.0
+PyYAML>=6.0
+markdown>=3.5
+Jinja2>=3.1.2
+Pillow>=10.0
+beautifulsoup4>=4.12
+lxml>=4.9
+openai>=1.30
+html2text>=2024.2.26

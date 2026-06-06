@@ -1,165 +1,245 @@
-# AI News Signal Green — AI 新闻信号卡风
+# AI新闻信号卡风 (ai-news-signal-green)
 
-用于「AI 模型发布 / 产品更新新闻 / 真假消息拆解 / 行业快讯解读」类公众号文章。它继承 `tech-card-green.md` 的清爽技术文档气质，但更强调新闻判断、证据分层和读者快速扫读。
+> 视觉定位：AI新闻 / 产品更新 / 分析师简报
+> 适合读者：关注AI动态的从业者、投资人、产品经理
 
-## Visual DNA
+---
 
-- Mood: AI newsroom, product changelog, analyst note, signal dashboard.
-- Canvas: white article body with a dark navy hero block, green as confirmed-signal accent.
-- Composition: first-screen conclusion, real official images, small evidence chips, section numbers, compact SVG explainers.
-- Best for: Claude/OpenAI/AI 工具发布、模型版本更新、传闻澄清、媒体报道汇总、产品安全事件。
-- Avoid: 夸张营销标题、无来源大图、纯装饰渐变、过多彩色标签。
+## 一、视觉定位
 
-## Color Tokens
+| 维度 | 描述 |
+|------|------|
+| 语气 | 紧迫、信号感、权威 |
+| 节奏 | 快节奏，信息密度极高，第一屏就要给结论 |
+| 配色 | 深色新闻底 + 绿色信号 + 白色数据 + 黄色警示 |
+| 字体 | 系统无衬线，数字用等宽 |
+| 留白 | 紧凑，像Bloomberg终端的信息密度 |
 
-```text
-hero-bg:       #111827
-accent:        #059669
-accent-light:  #10B981
-accent-bright: #34D399
-accent-soft:   #ECFDF5
-ink:           #111827
-body:          #374151
-muted:         #9CA3AF
-line:          #E5E7EB
-line-soft:     #F3F4F6
-surface:       #FFFFFF
-surface-soft:  #FAFAFA
-warning-bg:    #FEF3C7
-warning-text:  #92400E
-```
+---
 
-## Typography
+## 二、Color Token
 
-```text
-article:      15px / 1.78 / letter-spacing 0.4px
-hero label:   11px / 700 / letter-spacing 2.5px
-hero title:   26px / 900 / line-height 1.12
-section no:   26px / 900 / line-height 1
-section h2:   17px / 900
-card body:    14-15px / 1.35-1.8
-caption:      11px / 1.6 / muted
-```
+### 2.1 主色调
 
-Do not use viewport-scaled fonts. Keep letter spacing non-negative.
+| Token | 值 | 用途 |
+|-------|------|------|
+| `--c-black` | `#0A0A0A` | 深色背景、终极强调 |
+| `--c-gray-900` | `#1A1A1A` | Hero底色、深色卡片 |
+| `--c-gray-700` | `#3A3A3A` | 深色次要背景 |
+| `--c-gray-500` | `#8A8A8A` | 次要文字、时间戳 |
+| `--c-gray-300` | `#CCCCCC` | 浅色边框、分隔线 |
+| `--c-gray-100` | `#F5F5F5` | 浅底背景 |
+| `--c-white` | `#FFFFFF` | 深底上的文字、数据 |
 
-## Structure Pattern
+### 2.2 强调色
 
-Use this order for news articles:
+| Token | 值 | 用途 |
+|-------|------|------|
+| `--c-accent` | `#059669` | 信号色：看涨、利好、增长 |
+| `--c-accent-light` | `#34D399` | 浅信号：次要利好的标记 |
+| `--c-accent-bg` | `#052E16` | 深绿底：信号卡背景 |
+| `--c-signal-red` | `#EF4444` | 红色信号：看跌、风险、警告 |
+| `--c-signal-red-bg` | `#450A0A` | 深红底 |
+| `--c-highlight` | `#FDE68A` | 高光：核心数据、突发标记 |
+| `--c-highlight-text` | `#78350F` | 高光上文字 |
 
-1. Dark hero with topic and one-line status.
-2. Real source image close to the top.
-3. Green conclusion callout: what is confirmed.
-4. Three-card signal row: confirmed / key capability / pending.
-5. Numbered sections: news, stack, benchmark, risk/context, rumor.
-6. SVG explainers: timeline, signal layers, capability axes.
-7. Source list with official links and media links.
+### 2.3 语义色
 
-## Component Recipes
+| Token | 值 | 用途 |
+|-------|------|------|
+| `--c-verified` | `#3B82F6` | 已验证信息、官方来源 |
+| `--c-rumor` | `#F59E0B` | 传闻、未经证实 |
+| `--c-urgent` | `#EF4444` | 紧急、突发 |
 
-### Article Wrapper
+---
 
-```html
-<section style="max-width:677px;margin:0 auto;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;color:#374151;line-height:1.78;letter-spacing:0.4px;overflow-x:hidden;font-size:15px;">
-  ...
-</section>
-```
+## 三、独特组件
 
-### Dark News Hero
+### 3.1 Dark News Hero
+
+深色新闻头，紧迫感+核心信号。
 
 ```html
-<section style="margin:0;padding:26px 20px 18px;background:#111827;color:#ffffff;">
-  <p style="margin:0 0 8px;font-size:11px;line-height:1.6;color:rgba(255,255,255,0.48);font-weight:700;letter-spacing:2.5px;">AI NEWS · TOPIC</p>
-  <p style="margin:0;font-size:26px;line-height:1.12;color:#ffffff;font-weight:900;">主标题<br><span style="color:#34D399;">关键词</span></p>
-  <p style="margin:12px 0 0;font-size:14px;line-height:1.65;color:rgba(255,255,255,0.72);">一句状态判断。</p>
-</section>
-```
-
-### Real Image Frame
-
-Use official screenshots, official hero images, product UI screenshots, or publication screenshots. Keep every body image under 1MB.
-
-```html
-<section style="margin:0 20px 18px;padding-top:18px;">
-  <section style="background:#ffffff;border-radius:12px;padding:6px;border:1px solid #F3F4F6;box-shadow:0 4px 12px rgba(17,24,39,0.06);">
-    <figure style="margin:0;border-radius:8px;overflow:hidden;">
-      <img src="assets/example.jpg" style="width:100%;display:block;" />
-    </figure>
+<section style="background:#0A0A0A;border-radius:12px;padding:28px 24px;margin:0 0 20px 0;">
+  <section style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+    <section style="width:8px;height:8px;border-radius:50%;background:#EF4444;"></section>
+    <span style="font-size:12px;color:#EF4444;font-weight:bold;letter-spacing:1px;">BREAKING</span>
+    <span style="font-size:12px;color:#8A8A8A;">· 2小时前</span>
   </section>
-  <p style="margin:7px 0 0;font-size:11px;line-height:1.6;color:#9CA3AF;text-align:center;">图源：官方页面 / 媒体页面</p>
-</section>
-```
-
-### Conclusion Callout
-
-```html
-<section style="margin:0 20px 20px;padding:14px 16px;border-radius:12px;background:#ECFDF5;border-left:4px solid #059669;">
-  <p style="margin:0;font-size:15px;line-height:1.8;color:#111827;"><strong>先把结论说清楚：</strong>一句明确判断，重点用 <span style="color:#059669;font-weight:800;">绿色强调</span>。</p>
-</section>
-```
-
-### Three Signal Cards
-
-Use when a news item has different evidence levels. Keep all three cards visible in one row.
-
-```html
-<section style="margin:0 20px 24px;">
-  <section style="white-space:nowrap;">
-    <section style="display:inline-block;vertical-align:top;width:31.5%;margin-right:1.8%;border-radius:12px;padding:12px 8px;background:linear-gradient(135deg,#059669,#10B981);">
-      <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.72);font-weight:800;">已官宣</p>
-      <p style="margin:6px 0 0;font-size:14px;line-height:1.35;color:#fff;font-weight:900;white-space:normal;">Opus 4.8</p>
-    </section>
-    <section style="display:inline-block;vertical-align:top;width:31.5%;margin-right:1.8%;border-radius:12px;padding:12px 8px;background:#fff;border:1px solid #E5E7EB;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
-      <p style="margin:0;font-size:11px;color:#9CA3AF;font-weight:800;">重点能力</p>
-      <p style="margin:6px 0 0;font-size:14px;line-height:1.35;color:#111827;font-weight:900;white-space:normal;">长任务代理</p>
-    </section>
-    <section style="display:inline-block;vertical-align:top;width:31.5%;border-radius:12px;padding:12px 8px;background:#fff;border:1px solid #E5E7EB;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
-      <p style="margin:0;font-size:11px;color:#9CA3AF;font-weight:800;">仍待确认</p>
-      <p style="margin:6px 0 0;font-size:14px;line-height:1.35;color:#111827;font-weight:900;white-space:normal;">Sonnet 4.8</p>
-    </section>
+  <h1 style="margin:0 0 12px 0;font-size:20px;line-height:1.4;color:#FFFFFF;font-weight:bold;">OpenAI 发布 GPT-5：多模态推理能力飞跃</h1>
+  <p style="margin:0 0 16px 0;font-size:14px;line-height:1.6;color:#8A8A8A;">旗舰模型在数学推理和代码生成上超越人类专家水平</p>
+  <section style="display:flex;gap:8px;flex-wrap:wrap;">
+    <span style="display:inline-block;padding:4px 10px;background:#052E16;color:#34D399;font-size:11px;border-radius:4px;font-weight:bold;">↑ 利好 AI基础设施</span>
+    <span style="display:inline-block;padding:4px 10px;background:#052E16;color:#34D399;font-size:11px;border-radius:4px;font-weight:bold;">↑ 利好 AI应用层</span>
+    <span style="display:inline-block;padding:4px 10px;background:#450A0A;color:#FCA5A5;font-size:11px;border-radius:4px;font-weight:bold;">↓ 利空 传统SaaS</span>
   </section>
 </section>
 ```
 
-### Section Header
+### 3.2 Real Image Frame
+
+真图展示框，强调"这是真图不是AI生成"。
 
 ```html
-<section style="margin:34px 20px 16px;display:flex;align-items:flex-start;">
-  <section style="width:44px;min-width:44px;">
-    <p style="margin:0;color:#059669;font-size:26px;line-height:1;font-weight:900;">01</p>
-    <p style="margin:5px 0 0;color:#9CA3AF;font-size:10px;line-height:1;font-weight:800;letter-spacing:1.5px;">NEWS</p>
+<section style="margin:16px 0;border:2px solid #059669;border-radius:8px;overflow:hidden;">
+  <section style="background:#059669;padding:6px 12px;display:flex;align-items:center;gap:6px;">
+    <section style="width:6px;height:6px;border-radius:50%;background:#FFFFFF;"></section>
+    <span style="font-size:11px;color:#FFFFFF;font-weight:bold;">真实截图 · 非AI生成</span>
   </section>
-  <section style="width:1px;height:42px;background:#D1D5DB;margin:1px 12px 0 0;"></section>
-  <section>
-    <p style="margin:0;font-size:17px;line-height:1.45;color:#111827;font-weight:900;">小标题</p>
-    <p style="margin:3px 0 0;font-size:11px;line-height:1.5;color:#9CA3AF;">一句副标题。</p>
+  <img src="IMAGE_URL" style="width:100%;display:block;" />
+  <section style="padding:8px 12px;background:#F5F5F5;">
+    <p style="margin:0;font-size:12px;color:#3A3A3A;">来源：OpenAI 官方博客 · 2026.06.06</p>
   </section>
 </section>
 ```
 
-### Evidence Warning
+### 3.3 Conclusion Callout
 
-Use yellow for rumor / not-yet-confirmed / version caveats. Only use once or twice per article.
+结论框，一句话给出判断。
 
 ```html
-<section style="margin:0 20px 24px;padding:14px 16px;border-radius:12px;background:#FEF3C7;border-left:4px solid #F59E0B;">
-  <p style="margin:0;font-size:15px;line-height:1.8;color:#92400E;"><strong>一句话避坑：</strong>明确说明哪些还不是官宣。</p>
+<section style="margin:20px 0;padding:16px 20px;border-left:4px solid #059669;background:#F5F5F5;">
+  <p style="margin:0 0 4px 0;font-size:12px;color:#059669;font-weight:bold;letter-spacing:1px;">OUR TAKE</p>
+  <p style="margin:0;font-size:15px;line-height:1.6;color:#0A0A0A;font-weight:bold;">GPT-5 将在6个月内重塑企业AI应用格局，基础设施厂商先受益。</p>
 </section>
 ```
 
-## SVG Visualization Defaults
+### 3.4 Three Signal Cards
 
-- `viewBox="0 0 335 H"` for mobile-safe width.
-- Background `#FAFAFA`, radius 12.
-- Text font family `system-ui`.
-- Use green only for confirmed facts; gray for pending/unknown; navy for current focal point.
-- Useful templates: timeline, three-layer evidence stack, three-axis capability cards.
+三信号卡，红/绿/黄三个维度判断。
 
-## Writing Rules
+```html
+<section style="margin:20px 0;display:flex;gap:8px;">
+  <!-- 绿色信号 -->
+  <section style="flex:1;background:#052E16;border-radius:8px;padding:14px;text-align:center;">
+    <p style="margin:0 0 4px 0;font-size:22px;color:#34D399;font-weight:bold;">看多</p>
+    <p style="margin:0;font-size:12px;color:#34D399;">AI基础设施</p>
+    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;">GPU需求持续增长</p>
+  </section>
+  <!-- 黄色信号 -->
+  <section style="flex:1;background:#422006;border-radius:8px;padding:14px;text-align:center;">
+    <p style="margin:0 0 4px 0;font-size:22px;color:#FDE68A;font-weight:bold;">观望</p>
+    <p style="margin:0;font-size:12px;color:#FDE68A;">AI Agent赛道</p>
+    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;">商业模式待验证</p>
+  </section>
+  <!-- 红色信号 -->
+  <section style="flex:1;background:#450A0A;border-radius:8px;padding:14px;text-align:center;">
+    <p style="margin:0 0 4px 0;font-size:22px;color:#FCA5A5;font-weight:bold;">看空</p>
+    <p style="margin:0;font-size:12px;color:#FCA5A5;">传统SaaS</p>
+    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;">被AI原生替代</p>
+  </section>
+</section>
+```
 
-- 第一屏必须回答「到底发生了什么」。
-- 将信息分为：已官宣 / 官方文档 / 媒体报道 / 社区传闻。
-- 每个事实段最好有一条来源线索：官方发布、文档、系统卡、媒体报道。
-- 不把泄露字符串、社区截图、预测市场写成确定事实。
-- 真图优先：官方图、产品截图、文档截图、媒体截图；AI 生图只做封面或氛围，不用于事实图。
-- 标题可以有冲击力，正文必须把证据等级说清楚。
+### 3.5 Evidence Warning
+
+证据等级标注框。
+
+```html
+<section style="margin:16px 0;padding:12px 16px;background:#FEF3C7;border-radius:6px;border-left:3px solid #F59E0B;">
+  <section style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span style="font-size:12px;color:#92400E;font-weight:bold;">⚠️ 证据等级：B</span>
+    <span style="font-size:11px;color:#78350F;">行业传闻 + 多方交叉验证</span>
+  </section>
+  <p style="margin:0;font-size:13px;line-height:1.6;color:#78350F;">此消息来自三个独立信源，但官方尚未确认。发布时间可能调整。</p>
+</section>
+```
+
+---
+
+## 四、写作规则
+
+### 4.1 第一屏必须回答
+
+读者打开文章3秒内必须看到：
+
+1. **这事是什么** — 一句话说清
+2. **和我有什么关系** — 利好/利空谁
+3. **确定性多高** — 证据等级
+
+```html
+<!-- 第一屏结构 -->
+[Dark News Hero] → 包含标题+信号标签+时间
+[Conclusion Callout] → 一句话判断
+[Three Signal Cards] → 看多/观望/看空
+```
+
+### 4.2 信息分层
+
+| 层级 | 位置 | 内容 | 详细度 |
+|------|------|------|--------|
+| L0 信号 | 第一屏 | 一句话结论 + 方向判断 | 极简 |
+| L1 要点 | 前30% | 3-5个关键事实 | 精炼 |
+| L2 分析 | 中50% | 数据支撑 + 逻辑推理 | 中等 |
+| L3 附录 | 后20% | 来源链接 + 方法论说明 | 详细 |
+
+### 4.3 证据等级
+
+每个关键声明必须标注证据等级：
+
+| 等级 | 标签 | 含义 |
+|------|------|------|
+| A | ✅ 已确认 | 官方公告/财报/一手信息 |
+| B | ⚠️ 高可信 | 多信源交叉验证 |
+| C | 🟡 待验证 | 单一信源/行业传闻 |
+| D | 🔴 未经证实 | 社交媒体/匿名消息 |
+
+### 4.4 真图优先
+
+1. **优先使用真实截图**，而非AI生成图
+2. 所有截图必须用 Real Image Frame 包裹
+3. 明确标注来源和时间
+4. 如果没有真图，用SVG信息图替代，不使用AI生成图
+5. 禁止在图片中暗示未经验证的信息
+
+---
+
+## 五、完整文章结构模板
+
+```
+[Dark News Hero] → 突发/核心标题 + 信号标签
+[Conclusion Callout] → 一句话判断
+[Three Signal Cards] → 方向性判断
+---分隔---
+[Section Header] → 事件详情
+  [正文段落] → 事实描述
+  [Evidence Warning] → 证据等级标注
+  [Real Image Frame] → 官方截图
+[Section Header] → 影响分析
+  [正文段落] → 分析逻辑
+  [Callout深色] → 核心洞察
+  [SVG指标卡] → 数据展示
+[Section Header] → 后续展望
+  [正文段落] → 预判
+[文末总结块] → 行动建议
+[标签Chips] → 话题标签
+```
+
+---
+
+## 六、排版建议
+
+### 6.1 字数控制
+
+| 类型 | 建议字数 | 阅读时间 |
+|------|----------|----------|
+| 快讯 | 500-800字 | 2分钟 |
+| 深度分析 | 1500-2500字 | 5-8分钟 |
+| 周报汇总 | 2000-3000字 | 8-12分钟 |
+
+### 6.2 信号标签使用
+
+- 🔴 BREAKING — 突发新闻
+- 📊 DATA — 数据发布
+- 📢 ANNOUNCEMENT — 官方公告
+- 🔍 ANALYSIS — 深度分析
+- ⚡ ALERT — 紧急提醒
+- 📅 RECURRING — 定期更新（周报/月报）
+
+### 6.3 数字呈现规则
+
+1. 核心数字用等宽字体 + 加粗
+2. 百分比变化用绿色（增长）/红色（下降）+ ↑↓箭头
+3. 金额统一用一种货币标注
+4. 大数字用K/M/B简写（如5.2M, 1.3B）
+5. 对比数据必须放在同一行/同一卡

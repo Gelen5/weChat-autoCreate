@@ -1,0 +1,56 @@
+# 排版风格配置
+# 复制此文件为 style.yaml 并按需修改
+
+# ── 主题覆盖 ──────────────────────────────────────────
+# 在选定主题的基础上覆盖单个样式变量
+theme_overrides:
+  # 色彩
+  color_primary: ""
+  color_accent: ""
+  color_text: ""
+
+  # 字体
+  font_size_base: ""
+
+# ── 排版偏好 ──────────────────────────────────────────
+layout:
+  content_width: 677           # 内容最大宽度（px），微信标准
+  content_padding: 16          # 左右内边距（px）
+  line_height: 1.8             # 行高
+  paragraph_spacing: 8         # 段落间距（px）
+  section_spacing: 16          # 章节间距（px）
+
+# ── 标题样式 ──────────────────────────────────────────
+headings:
+  h1_align: center             # center / left
+  h2_border: left              # left / bottom / none
+  h2_border_color: ""          # 空=使用主题色
+  heading_numbering: false     # 是否自动编号
+
+# ── 代码块 ────────────────────────────────────────────
+code:
+  show_line_numbers: false     # 是否显示行号
+  highlight_theme: github      # 代码高亮主题
+  copy_button: false           # 是否显示复制按钮（微信不支持JS，仅装饰）
+
+# ── 引用块 ────────────────────────────────────────────
+blockquote:
+  style: border-left           # border-left / card / highlight
+  border_color: ""             # 空=使用主题强调色
+
+# ── 图片 ──────────────────────────────────────────────
+images:
+  border_radius: 6             # 圆角（px）
+  alignment: center            # center / left
+  caption_enabled: true        # 是否显示图片说明
+  caption_style: italic        # italic / normal
+
+# ── 自定义组件 ────────────────────────────────────────
+# 启用/禁用特定排版组件
+components:
+  tip_box: true                # 提示框
+  warning_box: true            # 警告框
+  info_card: true              # 信息卡片
+  stat_card: false             # 数据卡片
+  step_list: true              # 步骤列表
+  tag_list: true               # 标签列表

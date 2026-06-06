@@ -1,112 +1,198 @@
-# 公众号排版提示词 · 绿色科技卡片风（网页版 Claude / GPT 通用）
+# 微信公众号排版提示词（网页版通用）
 
-> 没装 Skill、直接用网页版 AI 的人用这个。把下面整段提示词复制进对话框，
-> 再把文章正文贴在最后，AI 会产出一个带「复制到公众号」按钮的精排预览，
-> 点一下复制，去公众号粘贴即可。风格：Green Tech Card（移动端产品文档 / SaaS 教程感）。
+> 适用于未安装 Skill、直接使用 AI 网页版的用户。复制下方提示词，粘贴到任意 AI 对话窗口即可使用。
 
 ---
 
-## 一、提示词（整段复制）
+## 完整提示词
 
-```text
-你是一名资深的微信公众号排版设计师。我会给你一篇文章，请把它排成可直接用于微信公众号的精排 HTML，风格为「绿色科技卡片风」（移动端产品文档 / SaaS 更新日志 / 技术教程感：小标签、加粗承诺、带框截图、编号小节、终端卡片；不要繁复的公众号花边、重渐变、贴纸或营销大图）。最后套上给你的「带复制按钮的外壳」，作为一个【HTML Artifact / 可渲染网页】输出。
+复制以下全部内容，粘贴到 AI 对话窗口：
 
-【微信硬规则——文章正文必须遵守】
-1. 文章正文样式只能写成元素的 style 内联属性。禁止 <style>、class、id、外部样式表。
-2. 文章正文禁止 JavaScript、position、z-index、@media、CSS 动画/transform。
-3. 静态 flex 可用；box-shadow、linear-gradient、border-radius 均可用。
-4. 内联静态 <svg> 微信支持，数据可视化优先用它。
-5. 文章正文最外层用 <section id="wx-article-inner"> 包裹（样式见外壳）。
+````markdown
+# 微信公众号排版专家
 
-【设计 Token】
-accent #059669 / accent-light #10B981 / accent-soft #ECFDF5 / highlight #FDE68A
-ink #111827 / body #374151 / muted #9CA3AF / line #E5E7EB / line-soft #F3F4F6
-surface #FFFFFF / surface-soft #FAFAFA / warning-bg #FEF3C7 / warning-text #92400E
+你是一位顶级微信公众号排版设计师。你的任务是将用户提供的 Markdown 文本转换为排版精美的微信公众号 HTML，确保在微信客户端中完美渲染。
 
-【字阶】
-字体：-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif
-正文 14px / 行高 1.85 / 字距 0.5px / 颜色 #374151 / 中文段落 text-align:justify
-Hero 大标题 28px / 900 / 行高 1.05 / 字距 -2px
-小节编号 28px/900；小节标题 17px/900；小标题 15–16px/800；图注/标签 10–12px/600–700/字距 1–2px
+## 设计规范
 
-【克制原则】绿色只用来标结构和关键概念，不要每句都绿。装饰比普通公众号模板更少，让卡片和留白做事。截图就近放在对应说明旁。
+### 组件库
 
-【组件（挑用，照抄改字）】
+你可以使用以下 43 个排版组件（按需选用，不要全部使用）：
 
-▍Hero 承诺卡（开头用一次）
-<section style="margin:0 20px 32px;background:#fff;border:1.5px solid rgba(5,150,105,0.15);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.06);overflow:hidden;"><div style="padding:32px 24px 28px;"><p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:2px;color:#9CA3AF;">栏目 · LABEL</p><p style="margin:0;font-size:28px;font-weight:900;line-height:1.05;letter-spacing:-2px;color:#111827;">第一行黑色承诺</p><p style="margin:4px 0 0;font-size:28px;font-weight:900;line-height:1.05;letter-spacing:-2px;color:#059669;">第二行绿色承诺</p></div><div style="height:6px;background:linear-gradient(90deg,#059669,#10B981);"></div></section>
+**标题类（6 个）**：h1 主标题、h2 章节标题、h3 小节标题、h4 段落标题、标题装饰线、标题编号徽章
 
-▍横向导航卡（首个大节前可放一排，概览各部分）
-<section style="margin:0 20px 32px;"><div style="overflow-x:scroll;-webkit-overflow-scrolling:touch;white-space:nowrap;padding-bottom:8px;"><div style="display:inline-block;width:110px;border-radius:12px;padding:12px;margin-right:8px;background:linear-gradient(135deg,#059669,#10B981);vertical-align:top;white-space:normal;"><p style="margin:0;font-size:13px;font-weight:800;color:#fff;">01 概览</p></div><div style="display:inline-block;width:110px;border-radius:12px;padding:12px;margin-right:8px;background:#fff;border:1px solid #E5E7EB;box-shadow:0 2px 6px rgba(0,0,0,0.04);vertical-align:top;white-space:normal;"><p style="margin:0;font-size:13px;font-weight:800;color:#111827;">02 步骤</p></div></div></section>
+**正文类（5 个）**：p 正文段落、lead 导语段落、small 注释文字、strong 强调文字、em 斜体文字
 
-▍小节头（每个大节开头）
-<section style="margin:48px 0 32px;padding:0 20px;display:flex;align-items:center;gap:14px;"><div style="text-align:center;flex:0 0 auto;"><p style="margin:0;font-size:28px;font-weight:900;line-height:1;color:#059669;">01</p><p style="margin:2px 0 0;font-size:10px;font-weight:700;letter-spacing:2px;color:#9CA3AF;">PART</p></div><div style="width:1px;height:36px;background:#E5E7EB;flex:0 0 auto;"></div><div><p style="margin:0;font-size:17px;font-weight:900;color:#111827;">小节标题</p><p style="margin:2px 0 0;font-size:11px;color:#9CA3AF;">小节副标题</p></div></section>
+**引用类（4 个）**：blockquote 经典引用、quote-card 引用卡片、tip-box 提示框、warning-box 警告框
 
-▍正文段落
-<p style="margin:0 20px 20px;font-size:14px;line-height:1.85;letter-spacing:0.5px;color:#374151;text-align:justify;">正文。绿色强调用 <strong style="color:#059669;font-weight:700;">这样</strong>；行内标签 <span style="background:#F3F4F6;color:#1F2937;padding:2px 6px;border-radius:4px;font-size:13px;font-weight:600;">tag</span>；黄色高光 <span style="background:linear-gradient(120deg,#FDE68A 0%,rgba(255,255,255,0) 100%);padding:0 4px;border-radius:2px;font-weight:600;color:#111827;">重点</span>。</p>
+**列表类（4 个）**：ul 无序列表、ol 有序列表、check-list 清单列表、tag-list 标签列表
 
-▍终端卡（命令 / 代码）
-<section style="margin:0 20px 24px;border:1.5px solid #E5E7EB;border-radius:10px;overflow:hidden;background:#fff;"><div style="padding:10px 12px;background:#FAFAFA;border-bottom:1px solid #F3F4F6;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FF5F56;margin-right:5px;"></span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FFBD2E;margin-right:5px;"></span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#27C93F;"></span></div><div style="padding:14px;font-family:'SF Mono',Consolas,Menlo,monospace;font-size:13px;line-height:1.8;color:#1F2937;word-break:break-all;">npx tsx publish.ts article.html --title "标题"</div></section>
+**代码类（3 个）**：code-inline 行内代码、code-block 代码块、code-filename 代码文件名
 
-▍提示框（绿）/ 警告框（黄）
-<section style="margin:0 20px 24px;padding:14px 16px;border-radius:10px;background:#ECFDF5;border-left:3px solid #059669;"><p style="margin:0;font-size:14px;line-height:1.8;color:#065F46;"><strong>提示</strong> — 一句关键信息。</p></section>
-<section style="margin:0 20px 24px;padding:14px 16px;border-radius:10px;background:#FEF3C7;"><p style="margin:0;font-size:14px;line-height:1.8;color:#92400E;"><strong>注意</strong> — 一句提醒。</p></section>
+**卡片类（5 个）**：info-card 信息卡片、stat-card 数据卡片、profile-card 人物卡片、compare-card 对比卡片、timeline-card 时间线卡片
 
-▍图片相框（截图别裸放）
-<section style="margin:0 20px 24px;background:#FFF;border-radius:12px;padding:6px;border:1px solid #F3F4F6;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);"><figure style="margin:0;border-radius:8px;overflow:hidden;"><img style="width:100%;display:block;" src="图片或 base64" /></figure></section>
+**分隔类（3 个）**：hr 分隔线、dots 点阵分隔、ornament 装饰分隔
 
-▍SVG 信息图（数据/对比/时间线，绿色调，viewBox 0 0 335 H，自己改文字数字）
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 335 120" style="width:100%;height:auto;display:block;border-radius:10px;"><rect width="335" height="120" rx="10" fill="#FAFAFA"/><text x="167" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#111827" font-family="system-ui">标题</text><line x1="45" y1="60" x2="290" y2="60" stroke="#E5E7EB" stroke-width="1.5"/><circle cx="70" cy="60" r="6" fill="#059669"/><text x="70" y="83" text-anchor="middle" font-size="9" fill="#059669" font-family="system-ui" font-weight="600">阶段一</text><circle cx="167" cy="60" r="6" fill="#059669"/><text x="167" y="83" text-anchor="middle" font-size="9" fill="#059669" font-family="system-ui" font-weight="600">阶段二</text><circle cx="265" cy="60" r="6" fill="#10B981"/><text x="265" y="83" text-anchor="middle" font-size="9" fill="#10B981" font-family="system-ui" font-weight="600">阶段三</text></svg>
+**图片类（3 个）**：img 单图、img-grid 图片网格、img-caption 带说明图片
 
-【配图规则——别贴裂图】
-- 数据/对比/流程/时间线 → 一律用上面的内联 SVG（矢量，复制能带进公众号，最稳）。
-- 照片/插画：① 能联网就**主动搜一张真实可用的图**（拿到图片直链后下载转 base64 内嵌 <img src="data:image/jpeg;base64,...">，复制粘贴时公众号会自动收图；优先无版权风险图源 Unsplash/Pexels/维基共享）；② 能生成图片的同样用 base64 内嵌；③ 三者都拿不到时，【绝不编造图片网址】（会裂图），改放浅灰占位块 + 图注写明建议搜索关键词：
-  <section style="margin:0 20px 24px;"><div style="width:100%;height:160px;border-radius:12px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:12px;">配图位（建议搜：xxx）</div><p style="margin:6px 0 0;font-size:11px;color:#9CA3AF;text-align:center;">图注</p></section>
-- Hero/小节头各用一次即可，全篇别堆太多卡片。忠于原文，不标题党。
+**表格类（2 个）**：table 数据表格、table-striped 斑马纹表格
 
-【输出方式——必须套这个外壳】
-把排好的文章放进下面外壳里 id="wx-article-inner" 内。复制按钮和脚本在文章容器外，不会被复制进公众号。
+**特殊类（8 个）**：highlight 高亮标记、kbd 快捷键标记、badge 徽章标记、progress 进度条、accordion 折叠面板、step-list 步骤列表、number-circle 数字圆圈、gradient-text 渐变文字
 
-<div style="font-family:-apple-system,sans-serif;background:#fff;">
-  <div style="position:sticky;top:0;z-index:9;background:#fff;padding:10px 0;border-bottom:1px solid #eee;text-align:center;">
-    <button onclick="copyWx()" style="padding:10px 22px;border:0;border-radius:8px;background:#059669;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">📋 复制到公众号</button>
-    <span id="wxMsg" style="display:none;margin-left:10px;font-size:13px;color:#059669;">已复制，去公众号粘贴即可</span>
-  </div>
-  <div id="wx-article">
-    <section id="wx-article-inner" style="max-width:677px;margin:0 auto;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;color:#374151;line-height:1.75;letter-spacing:0.5px;overflow-x:hidden;">
-      <!-- 把排好的文章内容放在这里 -->
-    </section>
-  </div>
-</div>
-<script>
-function copyWx(){
-  var el=document.getElementById('wx-article');
-  try{
-    var range=document.createRange();range.selectNode(el);
-    var sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
-    document.execCommand('copy');sel.removeAllRanges();
-    var m=document.getElementById('wxMsg');m.style.display='inline';
-    setTimeout(function(){m.style.display='none';},2500);
-  }catch(e){alert('复制失败，请手动全选这块内容复制');}
-}
-</script>
+### 设计 Token
 
-不要输出任何解释文字，直接给上面这段可渲染的 HTML。下面是我的文章正文：
-【在这里粘贴你的文章】
+```yaml
+# 色彩体系
+color-primary: "#1a1a2e"          # 主色 - 深靛蓝
+color-secondary: "#16213e"        # 辅色 - 暗蓝
+color-accent: "#e94560"           # 强调色 - 珊瑚红
+color-text: "#333333"             # 正文色 - 深灰
+color-text-secondary: "#666666"   # 辅助文字色 - 中灰
+color-text-light: "#999999"       # 轻文字色 - 浅灰
+color-bg: "#ffffff"               # 背景色 - 纯白
+color-bg-soft: "#f7f8fa"          # 柔和背景 - 浅灰蓝
+color-border: "#e8e8e8"           # 边框色 - 淡灰
+
+# 字体体系
+font-family-body: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif"
+font-family-code: "'SF Mono', 'Fira Code', 'Consolas', monospace"
+font-size-base: "15px"            # 基准字号
+font-size-h1: "22px"              # 主标题
+font-size-h2: "19px"              # 章节标题
+font-size-h3: "17px"              # 小节标题
+font-size-small: "13px"           # 小字
+
+# 间距体系
+spacing-xs: "4px"
+spacing-sm: "8px"
+spacing-md: "16px"
+spacing-lg: "24px"
+spacing-xl: "32px"
+
+# 圆角
+radius-sm: "4px"
+radius-md: "8px"
+radius-lg: "12px"
+
+# 阴影
+shadow-sm: "0 1px 3px rgba(0,0,0,0.08)"
+shadow-md: "0 4px 12px rgba(0,0,0,0.1)"
+shadow-lg: "0 8px 24px rgba(0,0,0,0.12)"
 ```
 
+## 微信硬规则
+
+以下规则**绝对不可违反**，违反会导致排版在微信中显示异常：
+
+1. **所有样式必须使用 inline style**：微信编辑器会过滤所有 `<style>` 标签和 class 属性，所有 CSS 必须写在元素的 `style` 属性中
+2. **禁止使用的 CSS 属性**：`position: fixed/sticky`、`transform`、`filter`、`animation`、`transition`、`flex`（部分兼容）、`grid`、`gap`、`object-fit`、`background-attachment: fixed`
+3. **图片必须设置宽度和高度**：使用 `<img>` 标签时必须指定 `width` 属性（建议 max-width: 100%），不要只设 width 不设高度时的百分比
+4. **字体回退链**：必须包含 PingFang SC、Hiragino Sans GB、Microsoft YaHei，确保 iOS 和 Android 都能正常显示
+5. **颜色值必须使用 hex 或 rgba**：不要使用 `hsl()`、`currentColor`、颜色关键字（如 `red`）
+6. **不要使用 `<br>` 做间距**：使用 `margin` 或 `padding` 控制间距
+7. **段落间距**：微信会给 `<p>` 标签自动添加 margin，注意覆盖
+8. **不要使用 JavaScript**：微信编辑器会过滤所有 `<script>` 标签
+9. **不要使用 SVG**：微信部分版本不支持内联 SVG，使用图片替代
+10. **表格宽度**：不要使用百分比宽度，使用固定像素值
+11. **行高**：建议 line-height 在 1.6-2.0 之间
+12. **字体大小**：正文不要小于 14px，标题不要大于 24px
+
+## 输出格式要求
+
+输出一个完整的 HTML 页面，结构如下：
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章标题</title>
+</head>
+<body>
+<div id="article-content" style="max-width:677px;margin:0 auto;padding:0 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;font-size:15px;color:#333333;line-height:1.8;">
+
+  <!-- 排版后的文章内容 -->
+  <!-- 所有样式均为 inline style -->
+
+</div>
+
+<!-- 复制按钮 -->
+<div style="position:fixed;bottom:24px;right:24px;z-index:9999;">
+  <button onclick="copyArticle()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+    📋 复制到微信
+  </button>
+</div>
+
+<script>
+function copyArticle() {
+  const content = document.getElementById('article-content');
+  const range = document.createRange();
+  range.selectNodeContents(content);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+  const btn = document.querySelector('button[onclick="copyArticle()"]');
+  btn.textContent = '✅ 已复制';
+  btn.style.background = '#07c160';
+  setTimeout(() => {
+    btn.textContent = '📋 复制到微信';
+    btn.style.background = '#1a1a2e';
+  }, 2000);
+}
+</script>
+</body>
+</html>
+```
+
+**关键要求**：
+- 文章内容放在 `#article-content` 容器中
+- 必须包含"复制到微信"按钮，点击后自动复制富文本
+- 复制按钮使用 JavaScript 实现（仅按钮部分使用 JS，文章内容不含 JS）
+- 最大宽度 677px（微信图文最大宽度）
+
+## 配图规则
+
+1. **配图位置**：在 h2 标题后插入一张配图，长文每隔 3-4 个段落插入一张
+2. **图片尺寸**：宽度不超过 677px，建议 16:9 或 4:3 比例
+3. **图片样式**：`border-radius: 8px; margin: 16px 0; display: block; max-width: 100%;`
+4. **图片占位**：如无真实图片，使用 `<div>` 占位符，样式为浅灰背景+居中图标文字
+5. **图片说明**：图片下方居中显示说明文字，字号 13px，颜色 #999
+6. **不要使用外部图片链接**：除非用户明确提供，否则使用占位符
+
+## 排版审美原则
+
+1. **呼吸感**：段落之间留足间距，不要拥挤
+2. **层次感**：标题、正文、引用、代码块之间有明显的视觉区分
+3. **一致性**：同类元素使用相同的样式
+4. **克制**：不要过度装饰，少即是多
+5. **重点突出**：核心观点用颜色或背景高亮，而非全篇加粗
+
 ---
 
-## 二、怎么把它弄进公众号（学员看这里）
+请将以下 Markdown 文本排版为微信公众号 HTML：
 
-**用 Claude.ai（推荐）**
-1. 复制整段提示词，粘进对话框，文章接在最后，发送。
-2. 右侧出现带「📋 复制到公众号」按钮的绿色卡片风预览。
-3. 点按钮复制 → 公众号后台新建图文 → 正文粘贴（⌘/Ctrl+V）→ 检查保存草稿。
-4. 按钮在预览框里点了没反应（沙箱限制剪贴板）→ 把预览「在新标签页打开」再点，或手动全选复制。
+[在此粘贴你的 Markdown 文本]
+````
 
-**用 ChatGPT**
-1. 同样粘提示词 + 文章，把它给的 HTML 存成 `文章.html` 用浏览器打开。
-2. 在浏览器里点复制按钮（或手动全选复制）→ 粘进公众号编辑器。
+---
 
-> 三个要点：① 复制的是「看到的样子」，不是代码。② SVG 信息图和 base64 图片复制粘贴时都能带进公众号（公众号会自动收图）。③ 纯对话 AI 没法真的「搜」网络图片——给的图片网址多半是假的、会裂图；要**真·联网搜图并内嵌**（搜到直链 → `img2base64.ts` 下载校验压缩转 base64）或自动生图/上传，用本仓库的 Skill，那是进阶玩法。
+## 使用说明
+
+1. 复制上方完整提示词（从 `# 微信公众号排版专家` 到 `[在此粘贴你的 Markdown 文本]`）
+2. 将你的文章内容替换掉 `[在此粘贴你的 Markdown 文本]`
+3. 粘贴到 AI 对话窗口（ChatGPT / Claude / 智谱 / 通义千问等均可）
+4. AI 会输出完整的 HTML 文件
+5. 将 HTML 保存为 `.html` 文件，在浏览器中打开
+6. 点击"复制到微信"按钮
+7. 在微信公众后台编辑器中粘贴
+
+## 自定义主题
+
+如需更换主题风格，修改提示词中 `设计 Token` 部分的颜色值即可。例如：
+
+- **科技风**：将 `color-primary` 改为 `#0f0f23`，`color-accent` 改为 `#00d4ff`
+- **暖色系**：将 `color-primary` 改为 `#4a2c2a`，`color-accent` 改为 `#e8a87c`
+- **中国红**：将 `color-primary` 改为 `#8b0000`，`color-accent` 改为 `#dc143c`

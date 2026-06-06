@@ -1,14 +1,25 @@
 {
   "name": "wechat-publisher-scripts",
+  "version": "2.0.0",
+  "description": "微信公众号全链路自动化 - TypeScript脚本",
   "private": true,
-  "type": "module",
   "scripts": {
-    "publish": "tsx publish.ts"
+    "publish": "ts-node scripts/publish.ts",
+    "render": "ts-node scripts/render.ts",
+    "imagegen": "ts-node scripts/imagegen.ts",
+    "img2base64": "ts-node scripts/img2base64.ts"
   },
   "dependencies": {
-    "marked": "^12.0.2"
+    "marked": "^12.0.0",
+    "jsdom": "^24.0.0",
+    "axios": "^1.7.0",
+    "sharp": "^0.33.0",
+    "form-data": "^4.0.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.2"
+    "typescript": "^5.4.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^20.12.0",
+    "@types/jsdom": "^21.1.0"
   }
 }

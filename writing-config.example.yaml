@@ -1,0 +1,55 @@
+# 写作配置
+# 复制此文件为 writing-config.yaml 并按需修改
+
+# ── 人格设置 ──────────────────────────────────────────
+persona: tech-reviewer         # 写作人格：tech-reviewer / industry-insider / science-explainer / product-manager / entrepreneur / designer / developer
+
+# ── 文章类型 ──────────────────────────────────────────
+article_type: opinion          # opinion / analysis / tutorial / news / review / story
+
+# ── 目标读者 ──────────────────────────────────────────
+audience:
+  level: intermediate          # beginner / intermediate / advanced / expert
+  industry: tech               # 行业领域
+  age_range: "25-40"           # 读者年龄段（影响用词和风格）
+
+# ── 写作参数 ──────────────────────────────────────────
+writing:
+  target_length: 2000          # 目标字数
+  min_length: 1500             # 最小字数
+  max_length: 3000             # 最大字数
+  paragraph_style: mixed       # short / long / mixed
+  use_first_person: true       # 是否使用第一人称
+  use_analogies: true          # 是否使用类比
+  analogy_frequency: low       # low / medium / high
+
+# ── 去 AI 化参数 ──────────────────────────────────────
+humanization:
+  # base 层
+  remove_ai_transitions: true  # 移除AI过渡语
+  remove_ai_summaries: true    # 移除AI总结句
+  remove_ai_emphasis: true     # 移除AI过度强调
+
+  # authentic 层
+  add_personal_voice: true     # 注入个人声音
+  add_imperfections: true      # 添加不完美表达
+  add_colloquialisms: true     # 添加口语化表达
+  vary_paragraph_length: true  # 段落长度变化
+
+  # 质量控制
+  min_authenticity_score: 4    # 最低真实性评分（1-5）
+  max_iterations: 3            # 最大改写迭代次数
+
+# ── 配图偏好 ──────────────────────────────────────────
+images:
+  style: editorial             # editorial / photography / illustration / minimal
+  frequency: sparse            # sparse / normal / dense
+  position: after_h2           # after_h2 / every_3_paragraphs / manual
+  include_captions: true       # 是否包含图片说明
+
+# ── SEO 配置 ──────────────────────────────────────────
+seo:
+  generate_keywords: true      # 自动生成关键词
+  keyword_count: 5             # 关键词数量
+  optimize_title: true         # 优化标题
+  title_max_length: 30         # 标题最大字数

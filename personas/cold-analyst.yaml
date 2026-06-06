@@ -1,0 +1,17 @@
+name: "cold-analyst"
+description: "冷静分析师——数据驱动，理性客观"
+voice_density: 0.3
+uncertainty_rate: 0.05
+paragraph_max_length: 90
+single_sentence_paragraph_rate: 0.1
+emotional_arc: "flat_professional"
+uncertainty_expressions:
+  - "数据显示..."
+  - "据可查证来源..."
+broken_sentence_styles: []
+avoid:
+  - "令人震惊"
+  - "难以置信"
+  - "毫无疑问"
+data_reaction_style: "precise_quantification"
+closing_tendency: "conditional_recommendation"

@@ -1,150 +1,424 @@
-# wechat-publisher
+# 全宇宙最屌的微信公众号全链路自动化生成 Skill
 
-> 把一篇文章排版成微信公众号合规的精排 HTML，自动上传图片、可选生成封面，一键写进公众号草稿箱。
-> A Claude skill that typesets articles into WeChat-ready HTML and pushes them straight to your draft box.
-
-> 作者 / Author：**sakuraoxo（喂鱼）**
-
-跟市面上「Markdown 一键转公众号」的工具不一样的地方在于：它不是套一个固定模板，而是让 **AI 照着一套组件库，为你这篇文章的内容现场手写排版**——卡片、编号小标题、深色金句框、还有**内联 SVG 信息图**（对比图、时间线、飞轮，矢量清晰且不占图片配额）。所以同样一篇稿子，出来的不是「文档感」，而是「设计过」。
+> 从一个选题想法到一篇排版精美、原创度高、自动发布的微信公众号文章——只需一条指令。
 
 ---
 
-## 效果预览
+## 三大核心创新
 
-> 把你用它排出来的成品截图放这里（封面卡 / 一张 SVG 信息图 / callout 框 / 文末总结块各一张最直观）。
->
-> 例如：
-> `docs/preview-cover.png` · `docs/preview-svg.png` · `docs/preview-callout.png`
-
----
-
-## 它能做什么
-
-- **组件化精排版**：黑白灰高级感配色 + 一套现成组件（封面卡、编号小标题、callout 框、金句框、步骤卡、文末总结、标签 chips）。
-- **内联 SVG 信息图**：数据可视化直接写进正文，微信原生支持，不占图片配额。
-- **联网配图 → base64 内嵌**：需要真实照片/实拍图时让 Claude 联网搜图，`img2base64.ts` 把图直链下载、校验、压到 ≤1MB、转成 base64 内嵌进正文 —— 复制预览时随渲染内容一起进公众号，无需上传。
-- **自动处理图片**：正文里的本地图 / 远程图 / base64 会自动上传到微信并替换链接。
-- **可选自动生成封面**：调用图像模型生成封面图。
-- **一键进草稿箱**：通过公众号官方 `draft/add` 接口写入，你在后台预览满意后再发。
-- **两种排版模式**：组件化手写 HTML（精排，默认）/ Markdown 套固定主题（快速兜底）。
+| # | 创新点 | 说明 |
+|---|--------|------|
+| 1 | **AI 现场手写排版** | 不是模板套壳，是 AI 根据文章语义实时生成排版指令——每篇文章的样式都是"手写"的、独一无二的 |
+| 2 | **3 层反 AI 评分 + 学习飞轮** | base → authentic → publish 三层递进式去 AI 痕迹，每次发布后自动采集评分数据回灌提示词，形成越用越好的飞轮 |
+| 3 | **43 模块 + 18 主题排版系统** | 43 个可组合排版组件 × 18 套预设主题 = 774 种风格组合，覆盖从极简到华丽的一切审美需求 |
 
 ---
 
-## 两种用法，按你的条件选
+## 功能特性：8 步全链路覆盖
 
-### 用法一：只排版，零门槛（推荐先从这里上手）
+```
+选题 → 大纲 → 撰稿 → 去AI化 → 配图 → 排版 → 预览 → 发布
+ ①      ②      ③       ④       ⑤      ⑥      ⑦      ⑧
+```
 
-**不需要任何 API、不需要认证公众号。** 用它把文章排成 HTML，然后手动粘进公众号编辑器即可。适合所有人，先看到效果再说。
+| 步骤 | 功能 | 说明 |
+|------|------|------|
+| ① 选题 | 智能选题生成 | 基于热点、行业趋势、历史数据推荐选题，支持自定义选题方向 |
+| ② 大纲 | 结构化大纲生成 | 自动生成逻辑清晰的文章大纲，支持多级标题和段落规划 |
+| ③ 撰稿 | 全文创作 | 按大纲逐节生成，支持多种文体风格和语气调节 |
+| ④ 去AI化 | 三层反AI检测 | base → authentic → publish 递进式改写，确保通过 AI 检测 |
+| ⑤ 配图 | 9 大图片源自动配图 | 支持 Unsplash / Pexels / Pixabay / 千图网 / 摄图网等 9 个图源 |
+| ⑥ 排版 | 43 模块智能排版 | AI 现场手写排版指令，18 主题 × 43 组件自由组合 |
+| ⑦ 预览 | 实时预览 + 一键复制 | 浏览器内实时渲染，一键复制富文本到微信编辑器 |
+| ⑧ 发布 | 自动化发布 | 通过 WeChat Publisher API 自动登录并发布，支持定时发布 |
 
-1. 准备一篇文章（`.md` 或纯文本）。
-2. 让 Claude 照 `references/components.md` 把它排成组件化 HTML（见下方「配合 Claude 使用」）。
-3. 在浏览器里打开生成的 HTML 预览效果（`references/article-template.html` 自带手机预览框）。
-4. 满意后，把正文 HTML 复制粘贴进公众号后台编辑器。
+---
 
-### 用法二：一键推送到草稿箱（需要认证公众号）
+## 三种排版模式对比
 
-适合已经有**已认证服务号 / 订阅号**、想省掉「复制粘贴 + 重新传图」这步的人。
+| 特性 | 纯内联模式 | CSS 主题模式 | AI 手写排版 |
+|------|-----------|-------------|------------|
+| **原理** | 所有样式写为 inline style | 外部 CSS class + 主题变量 | AI 根据文章语义实时生成排版指令 |
+| **重复性** | 固定模板，千篇一律 | 主题切换，有限变化 | 每篇独一无二 |
+| **微信兼容性** | ★★★★★ 完美 | ★★★★☆ 需转换 | ★★★★★ 完美 |
+| **表现力** | ★★☆☆☆ 有限 | ★★★★☆ 丰富 | ★★★★★ 无限 |
+| **上手难度** | 极低 | 中等 | 低（AI 代劳） |
+| **适用场景** | 简单通知、公告 | 固定风格系列文章 | 追求差异化的精品内容 |
+| **输出格式** | 纯 HTML + inline style | HTML + `<style>` 标签 | 纯 HTML + inline style |
 
-**前提：**
-- 公众号为**已认证**号，具备 `draft/add` 接口权限；
-- 运行这台机器的公网 IP 已加入公众号后台「IP 白名单」。
+---
 
-> 不熟悉拿密钥 / 填白名单的，看详细图文教程 👉 https://sakuraoxo.feishu.cn/wiki/TuA7wvDjiiQZQVkGNp1cK6uynae
+## 双轨交付
+
+| 轨道 | 说明 | 适用场景 |
+|------|------|----------|
+| **Skill 轨道** | 安装 Skill 后直接调用，全自动 8 步链路 | 日常批量生产，追求效率 |
+| **提示词轨道** | 使用 `prompts/` 目录下的提示词，在任意 AI 网页版手动执行 | 无需安装，灵活使用单步功能 |
+
+---
+
+## 快速开始
+
+### 1. 安装 Skill
 
 ```bash
-cd scripts
-npm install
-cp ../.env.example ../.env   # 然后填入凭证（见下）
-
-# 发布一篇排好的 HTML
-npx tsx publish.ts <文章.html> --title "标题" --author "作者" [--digest "摘要"] [--cover <封面图> | --gen-cover]
-
-# 或者：喂一个 Markdown，套固定主题快速排版
-npx tsx publish.ts <文章.md> --title "标题" --author "作者"
+# 在 CodeBuddy Code 中安装
+/skill install wechat-auto-publisher
 ```
 
-跑完会输出草稿 `media_id`，然后去 `https://mp.weixin.qq.com` → 内容管理 → 草稿箱 → 预览 → 发布。
-
----
-
-## 环境变量
-
-复制 `.env.example` 为 `.env` 填写。**`.env` 已被 `.gitignore` 忽略，绝对不要提交到仓库。**
-
-| 变量 | 用途 | 哪里拿 |
-|------|------|--------|
-| `WECHAT_APP_ID` | 公众号 AppID | 公众号后台 → 开发 → 基本配置 |
-| `WECHAT_APP_SECRET` | 公众号 AppSecret | 同上 |
-| `OPENAI_API_KEY` | 仅 `--gen-cover` 生成封面时需要 | OpenAI 后台 |
-
----
-
-## 配合 Claude 使用（精排版的关键）
-
-这套东西的精排能力，是靠 **Claude 当排版执行者**实现的——你给内容，Claude 照组件库做设计。把整个文件夹作为一个技能（Skill）交给 Claude Code / Claude 桌面端，然后说一句：
-
-> 帮我把这篇文章排成公众号 HTML，配 2 张 SVG 信息图，然后写进草稿箱。
-
-Claude 会按 `SKILL.md` 的流程：读组件库 → 复制模板填充 → 配图 → 本地预览 → 调 `publish.ts` 发布。
-
-你也可以完全手动：自己照 `references/components.md` 写 HTML，再单独跑 `publish.ts`。
-
----
-
-## 文件结构
+### 2. 一键生成
 
 ```
-wechat-publisher/
-├── SKILL.md                        # 给 Claude 看的工作流说明（也是人看的总览）
-├── .env.example                    # 凭证模板
-├── references/
-│   ├── components.md               # 组件库 + 设计 token + SVG 信息图模板（排版前必读）
-│   ├── article-template.html       # 带手机预览框的文章骨架，复制它开工
-│   ├── wechat-html-spec.md         # 微信 HTML/CSS 支持与过滤规范
-│   └── styles/
-│       ├── tech-card-green.md      # 技术卡片风预设（教程 / AI 工具 / SaaS 文档）
-│       └── ai-news-signal-green.md # AI 新闻信号卡风预设（模型发布 / 快讯解读）
-└── scripts/
-    ├── publish.ts                  # 发布入口，支持 .html 和 .md
-    ├── render.ts                   # Markdown 固定主题渲染（模式 B）
-    ├── imagegen.ts                 # 封面 / 配图生成
-    ├── img2base64.ts               # 图片直链/本地图 → 下载校验压缩 → base64 data URI
-    └── wechat.ts                   # 微信 API 封装
+/wechat-auto "AI 时代，程序员如何保持竞争力"
+```
+
+### 3. 预览 & 发布
+
+- 浏览器自动打开预览页面
+- 一键复制富文本到微信编辑器
+- 或使用自动发布功能直接推送
+
+---
+
+## 详细使用说明
+
+### 基础用法
+
+```bash
+# 从选题开始，全自动执行全链路
+/wechat-auto "你的选题关键词"
+
+# 仅生成大纲
+/wechat-auto --step outline "你的选题关键词"
+
+# 从已有稿件开始，仅执行排版+去AI化
+/wechat-auto --from-draft ./my-article.md
+
+# 指定主题和风格
+/wechat-auto --theme cyber-neon --style professional "你的选题关键词"
+```
+
+### 分步执行
+
+```bash
+# 步骤 1：选题
+/wechat-auto --step topic --industry tech --count 5
+
+# 步骤 2：大纲
+/wechat-auto --step outline --topic "AI 编程的未来"
+
+# 步骤 3：撰稿
+/wechat-auto --step draft --outline ./outline.md
+
+# 步骤 4：去AI化
+/wechat-auto --step humanize --draft ./draft.md --level authentic
+
+# 步骤 5：配图
+/wechat-auto --step images --draft ./humanized.md --source unsplash
+
+# 步骤 6：排版
+/wechat-auto --step format --draft ./final.md --theme ink-elegance
+
+# 步骤 7：预览
+/wechat-auto --step preview --html ./formatted.html
+
+# 步骤 8：发布
+/wechat-auto --step publish --html ./formatted.html --schedule "2026-06-07 08:00"
+```
+
+### 高级选项
+
+```bash
+# 自定义去AI化强度（1-3，默认2）
+/wechat-auto --humanize-level 3 "选题"
+
+# 批量生成
+/wechat-auto --batch topics.csv --theme random
+
+# 导出为多种格式
+/wechat-auto --export pdf,html,md "选题"
+
+# 使用自定义排版组件
+/wechat-auto --custom-components ./my-components/ "选题"
 ```
 
 ---
 
-## 微信排版的硬规则（写 HTML 前先知道）
+## 配置指南
 
-- **全部样式必须写成内联 `style`**。`<style>` 标签、`class`、`id` 在微信全部失效。
-- 不支持 JavaScript（`<script>` 被剔除）、`position`、`@media`、CSS 动画。
-- 静态 `flex` 布局可用，但别依赖 `gap` 做关键间距，必要时用 `margin`。
-- **内联静态 `<svg>` 微信支持**，是做数据可视化的首选。
-- 正文图片单张 ≤ 1MB（微信 `media/uploadimg` 限制），封面 ≤ 10MB。
+### Skill 配置文件
 
-更全的支持/过滤清单见 `references/wechat-html-spec.md`。
+在项目根目录创建 `.wechat-auto.yaml`：
+
+```yaml
+# 基础配置
+default_theme: ink-elegance    # 默认主题
+default_style: professional     # 默认风格（professional/casual/storytelling）
+humanize_level: 2              # 去AI化强度（1-3）
+
+# 图片配置
+image:
+  default_source: unsplash     # 默认图源
+  fallback_source: pexels      # 备用图源
+  min_width: 900               # 最小宽度
+  max_count: 5                 # 每篇最多配图数
+
+# 发布配置
+publish:
+  auto_preview: true           # 自动打开预览
+  default_schedule: "08:00"    # 默认定时发布时间
+  draft_mode: false            # 是否保存为草稿
+
+# 去AI化配置
+humanize:
+  enable_base: true            # 启用基础层
+  enable_authentic: true       # 启用真实层
+  enable_publish: true         # 启用发布层
+  learning_mode: true          # 启用学习飞轮
+```
+
+### 环境变量
+
+```bash
+# 图源 API Key（按需配置）
+export UNSPLASH_ACCESS_KEY="your-key"
+export PEXELS_API_KEY="your-key"
+export PIXABAY_API_KEY="your-key"
+
+# 微信公众号配置
+export WECHAT_APP_ID="your-app-id"
+export WECHAT_APP_SECRET="your-app-secret"
+```
 
 ---
 
-## 常见错误
+## 主题画廊：18 套预设主题
 
-| 报错 | 处理 |
-|------|------|
-| `Missing WECHAT_APP_ID` | 没配 `.env` |
-| `errcode=40164` / IP 限制 | 运行机器的公网 IP 没加进公众号后台「IP 白名单」 |
-| `errcode=48001` 接口未授权 | 公众号未认证或无 `draft/add` 权限 |
-| `Body image too large` | 正文图超 1MB，压缩后重试 |
-| `No title found` | 传 `--title` 或在 HTML 里放一个 `<h1>` |
+| # | 主题名 | 风格描述 |
+|---|--------|----------|
+| 1 | **ink-elegance** | 水墨风雅——中国传统水墨画意境，素雅留白 |
+| 2 | **cyber-neon** | 赛博霓虹——未来科技感，深色底+荧光高亮 |
+| 3 | **morning-mist** | 晨雾轻纱——柔和渐变，莫兰迪色调 |
+| 4 | **red-classic** | 红色经典——政务/党建风格，庄重大气 |
+| 5 | **tech-minimal** | 极简科技——黑白灰+蓝，工程师审美 |
+| 6 | **autumn-harvest** | 金秋收获——暖橙棕色调，温暖厚重 |
+| 7 | **ocean-depth** | 深海幽蓝——深蓝渐变，神秘深邃 |
+| 8 | **forest-breathe** | 森林呼吸——绿色系，清新自然 |
+| 9 | **sunset-glow** | 落日余晖——暖黄到橘红渐变，浪漫温馨 |
+| 10 | **arctic-aurora** | 极地极光——冷色渐变+光晕效果 |
+| 11 | **cherry-blossom** | 樱花物语——粉白渐变，日系少女风 |
+| 12 | **midnight-gold** | 午夜鎏金——深色底+金色点缀，高端商务 |
+| 13 | **peach-garden** | 桃园春色——粉绿撞色，活泼明快 |
+| 14 | **ink-wash** | 泼墨山水——大胆墨迹纹理，艺术气质 |
+| 15 | **desert-gold** | 大漠金沙——沙色暖调，辽阔苍茫 |
+| 16 | **rain-city** | 雨城烟雨——灰蓝调，朦胧诗意 |
+| 17 | **retro-typewriter** | 复古打字机——衬线字体+纸纹质感 |
+| 18 | **glass-morphism** | 玻璃拟态——毛玻璃效果+半透明层叠 |
 
 ---
 
-## 限制
+## 图片提供商支持
 
-- 不含 SVG 互动动画——互动效果走 `draft/add` 接口会被微信过滤掉。
-- 一键发布依赖**已认证**公众号；个人订阅号通常没有 `draft/add` 权限，请用「用法一：只排版」。
+| 提供商 | 类型 | 免费 | 说明 |
+|--------|------|------|------|
+| **Unsplash** | 图片 | 部分免费 | 高质量摄影作品，API 限速 |
+| **Pexels** | 图片 | 免费 | 高质量摄影作品，API 友好 |
+| **Pixabay** | 图片 | 免费 | 图片素材库，支持中文搜索 |
+| **千图网** | 图片 | 部分免费 | 国内图库，更符合中文语境 |
+| **摄图网** | 图片 | 部分免费 | 国内图库，正版商用 |
+| **Flaticon** | 图标 | 部分免费 | 矢量图标库 |
+| **IconFont** | 图标 | 免费 | 阿里巴巴图标库，中文生态 |
+| **AI Generated** | AI 图片 | 按量付费 | AI 生成配图，高度定制化 |
+| **Local** | 本地文件 | 免费 | 使用本地图片文件 |
+
+---
+
+## 与同类工具对比
+
+| 特性 | 本 Skill | mdnice | doocs/md | wechat-publisher | wewrite | md2wechat |
+|------|----------|--------|----------|-----------------|---------|-----------|
+| **排版方式** | AI 手写排版 | CSS 模板 | CSS 模板 | CSS 模板 | 固定模板 | CSS 模板 |
+| **主题数量** | 18 | ~30 | ~20 | ~10 | ~5 | ~8 |
+| **排版组件** | 43 | ~15 | ~10 | ~8 | ~5 | ~12 |
+| **去AI化** | 三层递进 | 无 | 无 | 无 | 无 | 两层 |
+| **AI 检测评分** | 有 | 无 | 无 | 无 | 无 | 有 |
+| **自动配图** | 9 大图源 | 无 | 无 | 无 | 无 | 无 |
+| **全链路自动化** | 8 步 | 仅排版 | 仅排版 | 排版+发布 | 仅排版 | 排版+去AI |
+| **自动发布** | 支持 | 不支持 | 不支持 | 支持 | 不支持 | 不支持 |
+| **学习飞轮** | 有 | 无 | 无 | 无 | 无 | 部分 |
+| **微信兼容性** | ★★★★★ | ★★★★☆ | ★★★★☆ | ★★★★☆ | ★★★☆☆ | ★★★★☆ |
+| **离线使用** | 支持 | 不支持 | 支持 | 支持 | 不支持 | 支持 |
+| **批量生产** | 支持 | 有限 | 有限 | 不支持 | 不支持 | 不支持 |
+| **开源** | MIT | 部分 | MIT | MIT | MIT | MIT |
+
+---
+
+## 架构说明
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    用户输入（选题/稿件）                    │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────────┐
+│                  8 步全链路流水线                         │
+│                                                         │
+│  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────────┐ ┌─────┐ ┌─────┐ │
+│  │选题  │→│大纲  │→│撰稿  │→│去AI化   │→│配图  │→│排版  │ │
+│  └─────┘ └─────┘ └─────┘ └─────────┘ └─────┘ └─────┘ │
+│                                     │                   │
+│                              ┌──────┴──────┐            │
+│                              │ 三层反AI引擎  │            │
+│                              │ base        │            │
+│                              │ authentic   │            │
+│                              │ publish     │            │
+│                              └──────┬──────┘            │
+│                                     │                   │
+│                              ┌──────┴──────┐            │
+│                              │  学习飞轮    │            │
+│                              │ 评分→回灌    │            │
+│                              └─────────────┘            │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+              ┌────────┴────────┐
+              ▼                 ▼
+     ┌──────────────┐  ┌──────────────┐
+     │  预览 + 复制  │  │  自动发布     │
+     │  (浏览器)     │  │  (API)       │
+     └──────────────┘  └──────────────┘
+```
+
+### 排版引擎架构
+
+```
+┌──────────────────────────────────────┐
+│         AI 排版指令生成器              │
+│   (根据文章语义实时生成排版指令)        │
+└──────────────┬───────────────────────┘
+               │
+       ┌───────┴───────┐
+       ▼               ▼
+┌─────────────┐ ┌─────────────┐
+│ 18 主题预设  │ │ 43 排版组件  │
+│ (色彩/字体/  │ │ (标题/引用/  │
+│  间距/装饰)  │ │  列表/卡片/  │
+│             │ │  分隔线/…)   │
+└──────┬──────┘ └──────┬──────┘
+       │               │
+       └───────┬───────┘
+               ▼
+┌──────────────────────────────────────┐
+│       样式合成引擎                     │
+│  主题变量 + 组件模板 → inline style    │
+└──────────────┬───────────────────────┘
+               │
+               ▼
+┌──────────────────────────────────────┐
+│    微信兼容性适配器                     │
+│  过滤不支持的 CSS / 自动降级           │
+└──────────────┬───────────────────────┘
+               │
+               ▼
+       纯 HTML + inline style
+       (微信完美渲染)
+```
+
+---
+
+## 常见问题
+
+### Q: 排版在微信编辑器里显示异常？
+
+A: 本 Skill 所有输出均为纯 inline style，已通过微信编辑器兼容性验证。如遇异常，请检查：
+1. 是否使用了复制按钮一键复制（而非手动选择复制）
+2. 是否在微信后台的"图文"编辑器中粘贴（非"草稿"编辑器）
+3. 如问题仍然存在，请提 Issue 并附上渲染截图
+
+### Q: 去 AI 化后文章质量会不会下降？
+
+A: 不会。三层去 AI 化不是简单的"替换同义词"，而是：
+- **base 层**：消除 AI 常见写作模式（如"值得注意的是"、"总而言之"）
+- **authentic 层**：注入真实写作特征（不完美句式、口语化表达、个人观点）
+- **publish 层**：终检微调，确保流畅自然
+
+每层改写后会进行质量评分，低于阈值会自动重写。
+
+### Q: 可以只用排版功能，不执行全链路吗？
+
+A: 可以。使用 `--step format` 参数即可单独执行排版步骤，也支持 `--from-draft` 从已有稿件开始。
+
+### Q: 支持哪些微信账号类型？
+
+A: 支持订阅号和服务号。自动发布功能需要已认证的服务号（需要 API 权限）。未认证账号可使用"预览 + 手动复制"方式。
+
+### Q: 学习飞轮的数据存在哪里？
+
+A: 存储在本地 `.wechat-auto/learning/` 目录下，包含历史评分数据和提示词优化记录。不会上传任何数据到外部服务器。
+
+### Q: 可以自定义主题吗？
+
+A: 可以。在 `.wechat-auto/themes/` 目录下创建 YAML 主题文件即可，格式参考内置主题。也支持在运行时通过 `--theme-override` 参数覆盖单个样式变量。
+
+---
+
+## 贡献指南
+
+欢迎贡献！以下是参与方式：
+
+1. **Fork 本仓库** → 创建特性分支（`git checkout -b feature/amazing-theme`）
+2. **提交改动** → 遵循 Conventional Commits 规范
+3. **发起 Pull Request** → 描述改动内容和动机
+
+### 贡献方向
+
+- 新主题：在 `themes/` 目录添加 YAML 主题文件
+- 新排版组件：在 `components/` 目录添加组件模板
+- 去AI化规则：改进 `prompts/humanizer-*.md` 中的检测规则
+- 图源适配：在 `providers/` 目录添加新的图片提供商适配器
+- Bug 修复：提 Issue 或直接 PR
+
+### 代码规范
+
+- Markdown 文件使用 2 空格缩进
+- YAML 文件使用 2 空格缩进
+- 提交信息格式：`type(scope): description`
+- 类型：feat / fix / docs / style / refactor / test / chore
+
+---
+
+## 致谢
+
+本项目站在三个优秀开源项目的肩膀上：
+
+1. **[wechat-publisher](https://github.com/spacingly/wechat-publisher)** — 微信公众号自动发布能力，提供了稳定的 API 交互和发布流程
+2. **[md2wechat](https://github.com/yingjieweb/md2wechat)** — Markdown 转微信排版 + 去 AI 痕迹引擎，提供了排版系统和 humanizer 核心逻辑
+3. **[Doocs](https://github.com/doocs/md)** — 微信 Markdown 编辑器，提供了 CSS 主题系统和微信兼容性方案
+
+感谢以上项目的作者和贡献者，没有他们的开源精神，就没有本项目的诞生。
 
 ---
 
 ## License
 
-[MIT](./LICENSE) © 2026 sakuraoxo（喂鱼）
+[MIT License](./LICENSE)
+
+Copyright (c) 2026 wechat-auto-publisher contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

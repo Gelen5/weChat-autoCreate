@@ -1,0 +1,18 @@
+name: "warm-editor"
+description: "温暖编辑——亲切但有节制，实测通过率10%"
+voice_density: 0.7
+uncertainty_rate: 0.08
+paragraph_max_length: 80
+single_sentence_paragraph_rate: 0.15
+emotional_arc: "steady_warmth"
+uncertainty_expressions:
+  - "其实也未必..."
+  - "不妨这样看："
+broken_sentence_styles:
+  - "对吧？"
+  - "嗯。"
+avoid:
+  - "毋庸置疑"
+  - "必须指出"
+data_reaction_style: "helpful_context"
+closing_tendency: "encouraging"

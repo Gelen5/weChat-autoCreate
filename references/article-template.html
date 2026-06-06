@@ -1,86 +1,410 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文章预览</title>
-<style>
-  /* 这个 <style> 仅用于本地预览的手机外壳，不会进入文章。
-     文章内容（ARTICLE HTML 之间）必须全部用内联样式。 */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #f0f0f0; display: flex; justify-content: center; padding: 20px;
-         font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
-  .phone-frame { width: 375px; background: #fff; border-radius: 24px;
-                 box-shadow: 0 8px 40px rgba(0,0,0,.12); overflow: hidden; }
-  .phone-header { height: 44px; display: flex; align-items: center; justify-content: center;
-                  font-size: 12px; color: #999; border-bottom: 1px solid #f0f0f0; }
-  .copy-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #eee;
-              padding: 12px 16px; display: flex; gap: 8px; }
-  .copy-bar button { flex: 1; padding: 10px; border: none; border-radius: 8px;
-                     font-size: 13px; font-weight: 600; cursor: pointer; }
-  .btn-copy { background: #1d1d1f; color: #fff; }
-  .btn-top { background: #f5f5f7; color: #1d1d1f; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>微信公众号文章预览</title>
+  <style>
+    /* ====== 页面基础 ====== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #E8E8E8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 80px;
+    }
+
+    /* ====== 工具栏 ====== */
+    .toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E0E0E0;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .toolbar button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid #D0D0D0;
+      border-radius: 6px;
+      background: #FFFFFF;
+      color: #333;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .toolbar button:hover {
+      background: #F5F5F5;
+      border-color: #999;
+    }
+
+    .toolbar button.primary {
+      background: #059669;
+      color: #FFFFFF;
+      border-color: #059669;
+    }
+
+    .toolbar button.primary:hover {
+      background: #047857;
+    }
+
+    .toolbar .status {
+      font-size: 12px;
+      color: #999;
+      margin-left: 8px;
+    }
+
+    /* ====== 手机预览框 ====== */
+    .phone-frame {
+      width: 375px;
+      min-height: 667px;
+      background: #FFFFFF;
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+      margin-top: 56px;
+      position: relative;
+    }
+
+    .phone-frame::before {
+      content: '';
+      display: block;
+      width: 120px;
+      height: 28px;
+      background: #1A1A1A;
+      border-radius: 0 0 16px 16px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ====== 文章内容区 ====== */
+    .article-content {
+      padding: 12px 16px 32px;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+    }
+
+    /* ====== 暗黑模式 ====== */
+    body.dark {
+      background: #1A1A1A;
+    }
+
+    body.dark .phone-frame {
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    body.dark .toolbar {
+      background: #2D2D2D;
+      border-bottom-color: #444;
+    }
+
+    body.dark .toolbar button {
+      background: #3A3A3A;
+      border-color: #555;
+      color: #DDD;
+    }
+
+    body.dark .toolbar button.primary {
+      background: #059669;
+      color: #FFF;
+    }
+
+    body.dark .status {
+      color: #888;
+    }
+
+    /* ====== 回到顶部按钮 ====== */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #059669;
+      color: #FFFFFF;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(5,150,105,0.3);
+      z-index: 99;
+      transition: transform 0.2s;
+    }
+
+    .back-to-top:hover {
+      transform: scale(1.1);
+    }
+
+    .back-to-top.visible {
+      display: flex;
+    }
+
+    /* ====== Toast提示 ====== */
+    .toast {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #333;
+      color: #FFF;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ====== 滚动条美化 ====== */
+    .article-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .article-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .article-content::-webkit-scrollbar-thumb {
+      background: #CCC;
+      border-radius: 2px;
+    }
+  </style>
 </head>
 <body>
-<div class="phone-frame">
-  <div class="phone-header">公众号文章预览</div>
-  <div id="article-content">
-
-<!-- ARTICLE HTML START -->
-<section style="margin:0 auto;padding:24px 20px 32px;max-width:677px;background:#fff;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;font-size:15px;line-height:1.8;letter-spacing:0.2px;">
-
-  <!-- 封面卡 -->
-  <section style="margin:0 0 20px;padding:28px 20px;border-radius:14px;background:#111;text-align:center;">
-    <p style="margin:0 0 6px;font-size:11px;line-height:1.6;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:3px;">品牌名 · 栏目</p>
-    <p style="margin:0 0 10px;font-size:20px;line-height:1.4;color:#fff;font-weight:800;">文章主标题</p>
-    <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.55);">一句话副标题</p>
-  </section>
-
-  <!-- 文章用 h1 承载标题（publish.ts 没传 --title 时会取它）；可隐藏 -->
-  <h1 style="display:none;">文章主标题</h1>
-
-  <p style="margin:8px 0;font-size:15px;line-height:1.8;color:#1d1d1f;">开场正文……</p>
-
-  <hr style="margin:24px 0;border:0;border-top:1px solid #eee;" />
-
-  <!-- 编号小标题 -->
-  <section style="display:flex;align-items:center;gap:10px;margin:8px 0 12px;">
-    <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#1d1d1f;color:#fff;font-size:13px;font-weight:800;">1</span>
-    <p style="margin:0;font-size:16px;line-height:1.5;color:#1d1d1f;font-weight:700;">第一个小标题</p>
-  </section>
-
-  <p style="margin:8px 0;font-size:15px;line-height:1.8;color:#1d1d1f;">这一节的正文……重点用 <strong>加粗</strong>。</p>
-
-  <!-- 更多组件见 references/components.md -->
-
-  <!-- 文末总结 -->
-  <section style="margin:24px 0 0;padding:18px;border-radius:10px;background:#111;">
-    <p style="margin:0 0 8px;font-size:16px;line-height:1.5;color:#fff;font-weight:700;">写在最后</p>
-    <p style="margin:8px 0;font-size:15px;line-height:1.8;color:rgba(255,255,255,0.8);">收尾……</p>
-  </section>
-
-</section>
-<!-- ARTICLE HTML END -->
-
+  <!-- 工具栏 -->
+  <div class="toolbar">
+    <button class="primary" onclick="copyArticle()">
+      📋 一键复制HTML
+    </button>
+    <button onclick="toggleDarkMode()">
+      🌙 暗黑模式
+    </button>
+    <span class="status" id="copyStatus"></span>
   </div>
-  <div class="copy-bar">
-    <button class="btn-copy" onclick="copyArticle()">复制带样式 HTML</button>
-    <button class="btn-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">回到顶部</button>
+
+  <!-- Toast提示 -->
+  <div class="toast" id="toast"></div>
+
+  <!-- 手机预览框 -->
+  <div class="phone-frame">
+    <div class="article-content" id="articleContent">
+
+      <!-- ========== ARTICLE HTML START ========== -->
+
+      <!-- 封面卡 -->
+      <section style="background:#2D2D2D;border-radius:12px;padding:32px 24px;margin:0 0 24px 0;">
+        <p style="margin:0 0 8px 0;font-size:12px;color:#10B981;letter-spacing:2px;">TECH INSIGHT</p>
+        <h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.4;color:#FFFFFF;font-weight:bold;">从零搭建微信公众号自动化排版系统</h1>
+        <p style="margin:0;font-size:13px;color:#B0B0B0;">AI Engineering · 2026年6月6日</p>
+      </section>
+
+      <!-- 编号小标题 -->
+      <section style="margin:32px 0 16px 0;">
+        <p style="margin:0 0 4px 0;font-size:12px;color:#059669;font-weight:bold;letter-spacing:1px;">01</p>
+        <h2 style="margin:0;font-size:18px;line-height:1.5;color:#1A1A1A;font-weight:bold;">为什么需要自动化排版</h2>
+        <section style="margin-top:8px;width:40px;height:3px;background:#059669;border-radius:2px;"></section>
+      </section>
+
+      <!-- 正文段落 -->
+      <p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#4A4A4A;text-align:justify;">微信公众号的排版一直是内容创作者的痛点。手动调整样式耗时耗力，而市面上现有的工具要么价格不菲，要么定制性不足。通过AI驱动的自动化排版系统，我们可以实现<strong style="color:#1A1A1A;">从Markdown到精美微信文章的一键转换</strong>。</p>
+
+      <!-- Callout浅灰信号框 -->
+      <section style="background:#F2F2F2;border-radius:8px;padding:16px;margin:16px 0;">
+        <p style="margin:0 0 4px 0;font-size:13px;color:#7A7A7A;font-weight:bold;">💡 提示</p>
+        <p style="margin:0;font-size:14px;line-height:1.7;color:#4A4A4A;">本文介绍的排版系统支持12种基础组件和3种SVG信息图模板，覆盖90%的公众号排版需求。</p>
+      </section>
+
+      <!-- 分隔线 -->
+      <section style="margin:24px 0;text-align:center;">
+        <section style="display:inline-block;width:60px;height:1px;background:#B0B0B0;vertical-align:middle;"></section>
+        <span style="display:inline-block;margin:0 12px;color:#B0B0B0;font-size:12px;">◆</span>
+        <section style="display:inline-block;width:60px;height:1px;background:#B0B0B0;vertical-align:middle;"></section>
+      </section>
+
+      <!-- 编号小标题2 -->
+      <section style="margin:32px 0 16px 0;">
+        <p style="margin:0 0 4px 0;font-size:12px;color:#059669;font-weight:bold;letter-spacing:1px;">02</p>
+        <h2 style="margin:0;font-size:18px;line-height:1.5;color:#1A1A1A;font-weight:bold;">核心设计理念</h2>
+        <section style="margin-top:8px;width:40px;height:3px;background:#059669;border-radius:2px;"></section>
+      </section>
+
+      <!-- 金句框 -->
+      <section style="margin:24px 0;padding:16px 20px;border-left:4px solid #059669;background:#ECFDF5;border-radius:0 8px 8px 0;">
+        <p style="margin:0;font-size:16px;line-height:1.6;color:#1A1A1A;font-weight:bold;">"好的排版不是让文章更好看，而是让读者更容易读完。"</p>
+      </section>
+
+      <!-- 步骤卡片 -->
+      <section style="margin:16px 0;">
+        <section style="display:flex;align-items:flex-start;">
+          <section style="flex-shrink:0;width:28px;height:28px;background:#059669;border-radius:50%;text-align:center;line-height:28px;color:#FFFFFF;font-size:14px;font-weight:bold;">1</section>
+          <section style="margin-left:12px;flex:1;">
+            <p style="margin:0 0 4px 0;font-size:15px;font-weight:bold;color:#1A1A1A;">用Markdown写内容</p>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#4A4A4A;">专注于内容本身，无需考虑排版。</p>
+          </section>
+        </section>
+      </section>
+
+      <section style="margin:16px 0;">
+        <section style="display:flex;align-items:flex-start;">
+          <section style="flex-shrink:0;width:28px;height:28px;background:#059669;border-radius:50%;text-align:center;line-height:28px;color:#FFFFFF;font-size:14px;font-weight:bold;">2</section>
+          <section style="margin-left:12px;flex:1;">
+            <p style="margin:0 0 4px 0;font-size:15px;font-weight:bold;color:#1A1A1A;">AI自动选择组件和布局</p>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#4A4A4A;">根据内容类型智能匹配最佳排版方案。</p>
+          </section>
+        </section>
+      </section>
+
+      <section style="margin:16px 0;">
+        <section style="display:flex;align-items:flex-start;">
+          <section style="flex-shrink:0;width:28px;height:28px;background:#059669;border-radius:50%;text-align:center;line-height:28px;color:#FFFFFF;font-size:14px;font-weight:bold;">3</section>
+          <section style="margin-left:12px;flex:1;">
+            <p style="margin:0 0 4px 0;font-size:15px;font-weight:bold;color:#1A1A1A;">一键复制到公众号编辑器</p>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#4A4A4A;">全内联样式，粘贴即用。</p>
+          </section>
+        </section>
+      </section>
+
+      <!-- Callout深色强调框 -->
+      <section style="background:#2D2D2D;border-radius:8px;padding:20px;margin:16px 0;">
+        <p style="margin:0 0 4px 0;font-size:13px;color:#10B981;font-weight:bold;">⚡ 核心优势</p>
+        <p style="margin:0;font-size:14px;line-height:1.7;color:#FFFFFF;">全内联样式输出，100%兼容微信编辑器，零格式丢失。</p>
+      </section>
+
+      <!-- 文末总结块 -->
+      <section style="margin:32px 0 0 0;padding:20px;background:#F2F2F2;border-radius:8px;">
+        <p style="margin:0 0 12px 0;font-size:15px;font-weight:bold;color:#1A1A1A;">📌 核心要点</p>
+        <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#4A4A4A;">1. Markdown + AI = 一键排版</p>
+        <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#4A4A4A;">2. 12组件 + 3SVG模板覆盖常见需求</p>
+        <p style="margin:0;font-size:14px;line-height:1.7;color:#4A4A4A;">3. 全内联样式，粘贴即用零格式丢失</p>
+      </section>
+
+      <!-- 标签Chips -->
+      <section style="margin:16px 0;display:flex;flex-wrap:wrap;gap:8px;">
+        <span style="display:inline-block;padding:4px 12px;background:#ECFDF5;color:#059669;font-size:12px;border-radius:20px;">自动化</span>
+        <span style="display:inline-block;padding:4px 12px;background:#F2F2F2;color:#4A4A4A;font-size:12px;border-radius:20px;">公众号排版</span>
+        <span style="display:inline-block;padding:4px 12px;background:#F2F2F2;color:#4A4A4A;font-size:12px;border-radius:20px;">AI生成</span>
+      </section>
+
+      <!-- ========== ARTICLE HTML END ========== -->
+
+    </div>
   </div>
-</div>
-<script>
-function copyArticle() {
-  const html = document.getElementById('article-content').innerHTML;
-  navigator.clipboard.write([new ClipboardItem({
-    'text/html': new Blob([html], {type: 'text/html'}),
-    'text/plain': new Blob([html], {type: 'text/plain'}),
-  })]).then(() => {
-    const b = document.querySelector('.btn-copy');
-    b.textContent = '已复制 ✓';
-    setTimeout(() => b.textContent = '复制带样式 HTML', 2000);
-  });
-}
-</script>
+
+  <!-- 回到顶部按钮 -->
+  <button class="back-to-top" id="backToTop" onclick="scrollToTop()">↑</button>
+
+  <script>
+    // ====== 一键复制 ======
+    function copyArticle() {
+      var content = document.getElementById('articleContent');
+      // 获取 ARTICLE HTML START 和 END 之间的内容
+      var html = content.innerHTML;
+      var startMarker = '<!-- ========== ARTICLE HTML START ========== -->';
+      var endMarker = '<!-- ========== ARTICLE HTML END ========== -->';
+      var startIdx = html.indexOf(startMarker);
+      var endIdx = html.indexOf(endMarker);
+
+      if (startIdx !== -1 && endIdx !== -1) {
+        var articleHtml = html.substring(startIdx + startMarker.length, endIdx).trim();
+      } else {
+        var articleHtml = html.trim();
+      }
+
+      if (navigator.clipboard && navigator.clipboard.write) {
+        var blob = new Blob([articleHtml], { type: 'text/html' });
+        var item = new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([articleHtml], { type: 'text/plain' }) });
+        navigator.clipboard.write([item]).then(function() {
+          showToast('✅ HTML已复制到剪贴板，可直接粘贴到公众号编辑器');
+        }).catch(function() {
+          fallbackCopy(articleHtml);
+        });
+      } else {
+        fallbackCopy(articleHtml);
+      }
+    }
+
+    function fallbackCopy(text) {
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('✅ HTML已复制到剪贴板');
+      } catch(e) {
+        showToast('❌ 复制失败，请手动选择复制');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // ====== Toast提示 ======
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // ====== 暗黑模式 ======
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+      var btn = event.target.closest('button');
+      if (document.body.classList.contains('dark')) {
+        btn.innerHTML = '☀️ 浅色模式';
+      } else {
+        btn.innerHTML = '🌙 暗黑模式';
+      }
+    }
+
+    // ====== 回到顶部 ======
+    var articleContent = document.getElementById('articleContent');
+    var backToTop = document.getElementById('backToTop');
+
+    articleContent.addEventListener('scroll', function() {
+      if (articleContent.scrollTop > 300) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    });
+
+    function scrollToTop() {
+      articleContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
 </body>
 </html>
