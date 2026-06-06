@@ -1,27 +1,42 @@
-# Dependencies
-node_modules/
-.venv/
-__pycache__/
-*.pyc
-
-# Environment
+# 配置文件（含敏感凭证）
+config.yaml
+config.yml
 .env
-.wechat-auto/
 
-# Build output
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+*.egg-info/
 dist/
 build/
 
+# Node.js
+node_modules/
+package-lock.json
+
+# 输出
+output/
+*.png
+*.jpg
+!personas/*.yaml
+
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Temp
-*.tmp
-*.bak
+# Lessons & playbook (用户本地数据)
+lessons.json
+playbook.json
+stats.yaml

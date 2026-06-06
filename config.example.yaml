@@ -1,40 +1,56 @@
-# 微信公众号全链路自动化生成 Skill 配置
-# 复制此文件为 .wechat-auto.yaml 并按需修改
+# 微信公众号全链路自动化 - API配置模板
+# 复制为 config.yaml 并填入真实凭证
 
-# ── 基础配置 ──────────────────────────────────────────
-default_theme: ink-elegance    # 默认主题（18个可选，见 README 主题画廊）
-default_style: professional    # 默认风格：professional / casual / storytelling
-humanize_level: 2              # 去AI化强度：1=仅base, 2=base+authentic, 3=三层全开
-
-# ── 图片配置 ──────────────────────────────────────────
-image:
-  default_source: unsplash     # 默认图源：unsplash / pexels / pixabay / ai-generated / local
-  fallback_source: pexels      # 备用图源（主图源失败时使用）
-  min_width: 900               # 最小图片宽度（px）
-  max_count: 5                 # 每篇文章最多配图数
-
-# ── 发布配置 ──────────────────────────────────────────
-publish:
-  auto_preview: true           # 排版完成后自动打开浏览器预览
-  default_schedule: "08:00"    # 默认定时发布时间
-  draft_mode: false            # true=仅保存草稿，false=直接发布
-
-# ── 去AI化配置 ────────────────────────────────────────
-humanize:
-  enable_base: true            # 启用基础层（消除AI写作模式）
-  enable_authentic: true       # 启用真实层（注入人类写作特征）
-  enable_publish: false        # 启用发布层（终检微调，消耗更多token）
-  learning_mode: true          # 启用学习飞轮（采集评分数据优化提示词）
-
-# ── LLM 配置 ─────────────────────────────────────────
-llm:
-  provider: openai             # openai / azure / custom
-  model: gpt-4o               # 默认模型
-  image_model: gpt-image-2    # 图片生成模型
-  temperature: 0.7             # 创造性参数（0-1）
-  max_tokens: 4096             # 单次最大输出 token
-
-# ── 微信公众号配置 ────────────────────────────────────
 wechat:
-  app_id: ""                   # 微信 AppID（也可通过环境变量 WECHAT_APP_ID 设置）
-  app_secret: ""               # 微信 AppSecret（也可通过环境变量 WECHAT_APP_SECRET 设置）
+  appid: ""            # 微信公众号 AppID
+  secret: ""           # 微信公众号 AppSecret
+
+# 图片生成提供商配置
+# 设置 image.provider 选择默认提供商
+# 可选: openai / doubao / gemini / dashscope / minimax / replicate / azure_openai / openrouter / jimeng
+image:
+  provider: "openai"
+
+  openai:
+    api_key: ""        # 或设置环境变量 OPENAI_API_KEY
+    model: "dall-e-3"  # dall-e-3 / gpt-image-2
+
+  doubao:
+    api_key: ""        # 或设置环境变量 DOUBAO_API_KEY
+    model: "doubao-seedream-3-0-t2i-250415"
+
+  gemini:
+    api_key: ""        # 或设置环境变量 GEMINI_API_KEY
+    model: "imagen-3.0-generate-001"
+
+  dashscope:
+    api_key: ""        # 或设置环境变量 DASHSCOPE_API_KEY
+    model: "wanx-v1"
+
+  minimax:
+    api_key: ""        # 或设置环境变量 MINIMAX_API_KEY
+    group_id: ""       # 或设置环境变量 MINIMAX_GROUP_ID
+    model: "image-01"
+
+  replicate:
+    api_token: ""      # 或设置环境变量 REPLICATE_API_TOKEN
+    model: "stability-ai/sdxl"
+
+  azure_openai:
+    api_key: ""        # 或设置环境变量 AZURE_OPENAI_API_KEY
+    endpoint: ""       # Azure OpenAI 终端
+    model: "dall-e-3"
+
+  openrouter:
+    api_key: ""        # 或设置环境变量 OPENROUTER_API_KEY
+    model: "openai/dall-e-3"
+
+  jimeng:
+    api_key: ""        # 或设置环境变量 JIMENG_API_KEY
+    model: "jimeng-2.1"
+
+# 主题配置
+style_file: "style.yaml"
+
+# 写作参数
+writing_config_file: "writing-config.yaml"

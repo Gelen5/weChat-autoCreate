@@ -1,56 +1,66 @@
-# 排版风格配置
-# 复制此文件为 style.yaml 并按需修改
+# 风格配置模板
+# 定义写作风格、人格、语气参数
 
-# ── 主题覆盖 ──────────────────────────────────────────
-# 在选定主题的基础上覆盖单个样式变量
-theme_overrides:
-  # 色彩
-  color_primary: ""
-  color_accent: ""
-  color_text: ""
+# 默认人格（对应 personas/ 目录下的YAML文件名）
+default_persona: "warm-editor"
 
-  # 字体
-  font_size_base: ""
+# 语气参数
+tone:
+  formality: "casual"           # formal / semi-formal / casual
+  humor_level: 0.3              # 0.0-1.0 幽默程度
+  technical_depth: "moderate"   # shallow / moderate / deep
+  audience: "general"           # general / professional / expert
 
-# ── 排版偏好 ──────────────────────────────────────────
-layout:
-  content_width: 677           # 内容最大宽度（px），微信标准
-  content_padding: 16          # 左右内边距（px）
-  line_height: 1.8             # 行高
-  paragraph_spacing: 8         # 段落间距（px）
-  section_spacing: 16          # 章节间距（px）
+# 段落风格
+paragraph:
+  min_length: 30
+  max_length: 200
+  prefer_short: true            # 偏好短段落
 
-# ── 标题样式 ──────────────────────────────────────────
-headings:
-  h1_align: center             # center / left
-  h2_border: left              # left / bottom / none
-  h2_border_color: ""          # 空=使用主题色
-  heading_numbering: false     # 是否自动编号
+# 标题风格
+headline:
+  style: "conversational"       # conversational / formal / provocative / curious
+  max_length: 30
+  use_numbers: true             # 倾向使用数字标题
 
-# ── 代码块 ────────────────────────────────────────────
-code:
-  show_line_numbers: false     # 是否显示行号
-  highlight_theme: github      # 代码高亮主题
-  copy_button: false           # 是否显示复制按钮（微信不支持JS，仅装饰）
+# 开头风格
+opening:
+  style: "hook"                 # hook / question / story / data / quote
+  avoid_patterns:
+    - "在这个"
+    - "随着"
+    - "如今"
 
-# ── 引用块 ────────────────────────────────────────────
-blockquote:
-  style: border-left           # border-left / card / highlight
-  border_color: ""             # 空=使用主题强调色
+# 结尾风格
+closing:
+  style: "open_ended"           # open_ended / call_to_action / summary / provocative_question
+  avoid_patterns:
+    - "总而言之"
+    - "综上所述"
 
-# ── 图片 ──────────────────────────────────────────────
-images:
-  border_radius: 6             # 圆角（px）
-  alignment: center            # center / left
-  caption_enabled: true        # 是否显示图片说明
-  caption_style: italic        # italic / normal
+# 禁用词列表
+forbidden_words:
+  - "值得注意的是"
+  - "综上所述"
+  - "总而言之"
+  - "不可忽视"
+  - "至关重要"
+  - "不言而喻"
+  - "毋庸置疑"
+  - "显而易见"
+  - "不可或缺"
+  - "令人瞩目"
+  - "令人惊叹"
+  - "令人兴奋"
+  - "颠覆性"
+  - "革命性"
+  - "划时代"
+  - "跨时代"
+  - "干货"
+  - "必读"
+  - "必看"
 
-# ── 自定义组件 ────────────────────────────────────────
-# 启用/禁用特定排版组件
-components:
-  tip_box: true                # 提示框
-  warning_box: true            # 警告框
-  info_card: true              # 信息卡片
-  stat_card: false             # 数据卡片
-  step_list: true              # 步骤列表
-  tag_list: true               # 标签列表
+# AIGC声明
+aigc:
+  enabled: false
+  text: "本文由AI辅助创作，经人工审核编辑后发布"

@@ -1,55 +1,67 @@
-# 写作配置
-# 复制此文件为 writing-config.yaml 并按需修改
+# 写作参数模板 - 18个核心参数
+# 控制AI写作的行为和输出质量
 
-# ── 人格设置 ──────────────────────────────────────────
-persona: tech-reviewer         # 写作人格：tech-reviewer / industry-insider / science-explainer / product-manager / entrepreneur / designer / developer
+# ── 基础参数 ──
 
-# ── 文章类型 ──────────────────────────────────────────
-article_type: opinion          # opinion / analysis / tutorial / news / review / story
+# 目标字数（文章长度）
+target_word_count: 1500
 
-# ── 目标读者 ──────────────────────────────────────────
-audience:
-  level: intermediate          # beginner / intermediate / advanced / expert
-  industry: tech               # 行业领域
-  age_range: "25-40"           # 读者年龄段（影响用词和风格）
+# 段落数量范围
+paragraph_count_min: 5
+paragraph_count_max: 12
 
-# ── 写作参数 ──────────────────────────────────────────
-writing:
-  target_length: 2000          # 目标字数
-  min_length: 1500             # 最小字数
-  max_length: 3000             # 最大字数
-  paragraph_style: mixed       # short / long / mixed
-  use_first_person: true       # 是否使用第一人称
-  use_analogies: true          # 是否使用类比
-  analogy_frequency: low       # low / medium / high
+# 平均句长（字）
+avg_sentence_length: 18
 
-# ── 去 AI 化参数 ──────────────────────────────────────
-humanization:
-  # base 层
-  remove_ai_transitions: true  # 移除AI过渡语
-  remove_ai_summaries: true    # 移除AI总结句
-  remove_ai_emphasis: true     # 移除AI过度强调
+# 句长标准差（越大越像人类）
+sentence_length_stddev: 8
 
-  # authentic 层
-  add_personal_voice: true     # 注入个人声音
-  add_imperfections: true      # 添加不完美表达
-  add_colloquialisms: true     # 添加口语化表达
-  vary_paragraph_length: true  # 段落长度变化
+# ── 段落参数 ──
 
-  # 质量控制
-  min_authenticity_score: 4    # 最低真实性评分（1-5）
-  max_iterations: 3            # 最大改写迭代次数
+# 单句段落比例（短段落占比）
+single_sentence_paragraph_rate: 0.2
 
-# ── 配图偏好 ──────────────────────────────────────────
-images:
-  style: editorial             # editorial / photography / illustration / minimal
-  frequency: sparse            # sparse / normal / dense
-  position: after_h2           # after_h2 / every_3_paragraphs / manual
-  include_captions: true       # 是否包含图片说明
+# 段落最大字数
+paragraph_max_length: 200
 
-# ── SEO 配置 ──────────────────────────────────────────
-seo:
-  generate_keywords: true      # 自动生成关键词
-  keyword_count: 5             # 关键词数量
-  optimize_title: true         # 优化标题
-  title_max_length: 30         # 标题最大字数
+# 段落间过渡句概率
+transition_probability: 0.3
+
+# ── 语气参数 ──
+
+# 不确定性表达频率（0-1，越高越像人类）
+uncertainty_rate: 0.2
+
+# 词汇丰富度目标（type-token ratio，0-1）
+vocabulary_richness: 0.45
+
+# 副词使用密度（每百字）
+adverb_density: 4
+
+# 负面情绪比例（0-1）
+negative_emotion_ratio: 0.1
+
+# ── 结构参数 ──
+
+# 修辞手法使用概率
+rhetoric_probability: 0.3
+
+# 设问句频率
+question_frequency: 0.08
+
+# 引用/数据支撑频率
+citation_frequency: 0.15
+
+# ── 反AI参数 ──
+
+# 禁用词严格度（0-1，越高越严格）
+forbidden_word_strictness: 0.8
+
+# 自我纠正插入概率
+self_correction_rate: 0.05
+
+# 词汇温度（口语化程度，0-1）
+word_warmth: 0.4
+
+# 碎句概率（<5字短句）
+broken_sentence_rate: 0.1
