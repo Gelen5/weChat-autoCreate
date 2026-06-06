@@ -1,25 +1,27 @@
-# 凭证 —— 千万别提交
-.env
-.env.local
-
-# 依赖
+# Dependencies
 node_modules/
+.venv/
+__pycache__/
+*.pyc
 
-# 构建产物 / 生成的文章
-*.png
-*.jpg
-*.jpeg
-*.gif
-# 例外：保留 README 用到的示例图
-!docs/**/*.png
-!docs/**/*.jpg
+# Environment
+.env
+.wechat-auto/
 
-# macOS
-.DS_Store
-__MACOSX/
-._*
+# Build output
+dist/
+build/
 
-# 编辑器
+# IDE
 .vscode/
 .idea/
-*.log
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.bak
