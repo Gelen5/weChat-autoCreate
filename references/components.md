@@ -8,34 +8,31 @@
 
 ### 1.1 配色系统
 
-**主色调（黑白灰）**
+**主色调（Ink — 苹果级黑白灰）**
 
 | Token | 值 | 用途 |
 |-------|------|------|
-| `--c-black` | `#1A1A1A` | 标题、强调文字 |
-| `--c-gray-900` | `#2D2D2D` | 深色背景、卡片深色底 |
-| `--c-gray-700` | `#4A4A4A` | 正文主色 |
-| `--c-gray-500` | `#7A7A7A` | 次要文字、说明文字 |
-| `--c-gray-300` | `#B0B0B0` | 分隔线、边框 |
-| `--c-gray-100` | `#F2F2F2` | 浅色背景、代码块底 |
+| `--c-black` | `#1D1D1F` | 标题、深色块背景、强调文字 |
+| `--c-gray-700` | `#6E6E73` | 正文主色 |
+| `--c-gray-500` | `#A1A1A6` | 次要文字、说明文字、注释 |
+| `--c-gray-300` | `#D0D0D0` | 分隔线、标签边框 |
+| `--c-gray-200` | `#E5E5E5` | 细边框、浅分隔线 |
+| `--c-gray-100` | `#F7F7F5` | 浅底背景、步骤卡片底 |
+| `--c-cream` | `#FBF8F1` | 暖色浅底、金句框底、强调区域 |
 | `--c-white` | `#FFFFFF` | 卡片白底、文章背景 |
 
-**强调色（按风格预设切换）**
-
-| Token | 默认值 | 用途 |
-|-------|--------|------|
-| `--c-accent` | `#059669` | 主强调色，标题装饰、按钮 |
-| `--c-accent-light` | `#10B981` | 浅强调色，标签、次要装饰 |
-| `--c-accent-bg` | `#ECFDF5` | 强调色浅底，callout背景 |
-| `--c-highlight` | `#FDE68A` | 高光色，金句框、重点标记 |
-
-**语义色**
+**强调色（Gold — 唯一accent，克制使用）**
 
 | Token | 值 | 用途 |
-|-------|------|------|
-| `--c-danger` | `#EF4444` | 警示、风险标注 |
-| `--c-warning` | `#F59E0B` | 注意、提示 |
-| `--c-info` | `#3B82F6` | 信息补充 |
+|-------|--------|------|
+| `--c-accent` | `#C9A962` | 主强调：编号圆点、Hero标签、终端$符、核心判断高亮 |
+| `--c-accent-bg` | `#FBF8F1` | accent浅底：callout背景、金句框底、指标卡边框 |
+
+**设计原则：一篇文章只用1个accent色。语义色仅用于极端情况，不用于常规排版。**
+
+> ⚠️ **反彩虹规则**：不要在一篇文章里使用绿/红/蓝/黄等多种强调色。
+> 如果需要区分层级，用黑白灰的**明度差异**，而不是色相差异。
+> 语义色（危险/警告）仅在表达真实风险时使用，不用于装饰。
 
 ### 1.2 字阶
 
@@ -87,10 +84,10 @@
 文章开头的深色背景卡片，展示标题、作者、日期。
 
 ```html
-<section style="background:#2D2D2D;border-radius:12px;padding:32px 24px;margin:0 0 24px 0;">
-  <p style="margin:0 0 8px 0;font-size:12px;color:#10B981;letter-spacing:2px;">CATEGORY</p>
+<section style="background:#1D1D1F;border-radius:12px;padding:32px 24px;margin:0 0 24px 0;">
+  <p style="margin:0 0 8px 0;font-size:11px;color:#C9A962;letter-spacing:3px;font-weight:bold;">CATEGORY</p>
   <h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.4;color:#FFFFFF;font-weight:bold;">文章标题写在这里</h1>
-  <p style="margin:0;font-size:13px;color:#B0B0B0;">作者名 · 2026年6月6日</p>
+  <p style="margin:0;font-size:13px;color:#A1A1A6;">作者名 · 2026年6月6日</p>
 </section>
 ```
 
@@ -99,10 +96,9 @@
 带编号和装饰线的小节标题。
 
 ```html
-<section style="margin:32px 0 16px 0;">
-  <p style="margin:0 0 4px 0;font-size:12px;color:#059669;font-weight:bold;letter-spacing:1px;">01</p>
-  <h2 style="margin:0;font-size:18px;line-height:1.5;color:#1A1A1A;font-weight:bold;">小节标题</h2>
-  <section style="margin-top:8px;width:40px;height:3px;background:#059669;border-radius:2px;"></section>
+<section style="margin:32px 0 16px 0;display:flex;align-items:center;gap:12px;">
+  <section style="flex-shrink:0;width:32px;height:32px;background:#1D1D1F;border-radius:8px;text-align:center;line-height:32px;color:#C9A962;font-size:14px;font-weight:bold;">1</section>
+  <h2 style="margin:0;font-size:18px;line-height:1.4;color:#1D1D1F;font-weight:bold;">小节标题</h2>
 </section>
 ```
 
@@ -111,7 +107,7 @@
 标准正文段落，含首行缩进和段间距。
 
 ```html>
-<p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#4A4A4A;text-align:justify;">这里是正文内容，每段之间用16px间距分隔。支持<strong style="color:#1A1A1A;">加粗强调</strong>和<span style="color:#059669;font-weight:bold;">彩色强调</span>。</p>
+<p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#6E6E73;text-align:justify;">这里是正文内容，每段之间用16px间距分隔。支持<strong style="color:#1D1D1F;">加粗强调</strong>和<span style="color:#C9A962;font-weight:bold;">金色强调</span>。</p>
 ```
 
 ### 组件5：分隔线 (Divider)
@@ -120,9 +116,9 @@
 
 ```html
 <section style="margin:24px 0;text-align:center;">
-  <section style="display:inline-block;width:60px;height:1px;background:#B0B0B0;vertical-align:middle;"></section>
-  <span style="display:inline-block;margin:0 12px;color:#B0B0B0;font-size:12px;">◆</span>
-  <section style="display:inline-block;width:60px;height:1px;background:#B0B0B0;vertical-align:middle;"></section>
+  <section style="display:inline-block;width:40px;height:1px;background:#E5E5E5;vertical-align:middle;"></section>
+  <span style="display:inline-block;margin:0 14px;color:#D0D0D0;font-size:8px;">●</span>
+  <section style="display:inline-block;width:40px;height:1px;background:#E5E5E5;vertical-align:middle;"></section>
 </section>
 ```
 
@@ -131,9 +127,9 @@
 浅灰色背景的提示框，用于补充说明、引用数据。
 
 ```html
-<section style="background:#F2F2F2;border-radius:8px;padding:16px;margin:16px 0;">
-  <p style="margin:0 0 4px 0;font-size:13px;color:#7A7A7A;font-weight:bold;">💡 提示</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#4A4A4A;">这里是补充说明的内容，适合放数据引用、背景知识或注意事项。</p>
+<section style="background:#F7F7F5;border-radius:8px;padding:16px;margin:16px 0;">
+  <p style="margin:0 0 4px 0;font-size:13px;color:#6E6E73;font-weight:bold;">💡 提示</p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;">这里是补充说明的内容，适合放数据引用、背景知识或注意事项。</p>
 </section>
 ```
 
@@ -142,9 +138,9 @@
 深色背景的强提示框，用于核心观点、重要声明。
 
 ```html
-<section style="background:#2D2D2D;border-radius:8px;padding:20px;margin:16px 0;">
-  <p style="margin:0 0 4px 0;font-size:13px;color:#10B981;font-weight:bold;">⚡ 核心观点</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#FFFFFF;">这里是必须被读者记住的核心信息，深色背景制造视觉停顿。</p>
+<section style="background:#1D1D1F;border-radius:8px;padding:20px;margin:16px 0;">
+  <p style="margin:0 0 4px 0;font-size:13px;color:#C9A962;font-weight:bold;">⚡ 核心观点</p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#A1A1A6;">这里是必须被读者记住的核心信息，深色背景制造视觉停顿。</p>
 </section>
 ```
 
@@ -153,9 +149,9 @@
 带左侧色条的高亮引用框，适合名言、关键结论。
 
 ```html
-<section style="margin:24px 0;padding:16px 20px;border-left:4px solid #059669;background:#ECFDF5;border-radius:0 8px 8px 0;">
-  <p style="margin:0;font-size:16px;line-height:1.6;color:#1A1A1A;font-weight:bold;">"这里是一句值得被记住的金句，读者会截图分享的那种。"</p>
-  <p style="margin:8px 0 0 0;font-size:13px;color:#7A7A7A;">—— 出出处</p>
+<section style="margin:24px 0;padding:16px 20px;border-left:3px solid #C9A962;background:#FBF8F1;border-radius:0 8px 8px 0;">
+  <p style="margin:0;font-size:15px;line-height:1.7;color:#1D1D1F;font-weight:bold;">"这里是一句值得被记住的金句，读者会截图分享的那种。"</p>
+  <p style="margin:8px 0 0 0;font-size:13px;color:#A1A1A6;">—— 出处</p>
 </section>
 ```
 
@@ -166,10 +162,10 @@
 ```html
 <section style="margin:16px 0;">
   <section style="display:flex;align-items:flex-start;">
-    <section style="flex-shrink:0;width:28px;height:28px;background:#059669;border-radius:50%;text-align:center;line-height:28px;color:#FFFFFF;font-size:14px;font-weight:bold;">1</section>
+    <section style="flex-shrink:0;width:28px;height:28px;background:#1D1D1F;border-radius:50%;text-align:center;line-height:28px;color:#C9A962;font-size:14px;font-weight:bold;">1</section>
     <section style="margin-left:12px;flex:1;">
-      <p style="margin:0 0 4px 0;font-size:15px;font-weight:bold;color:#1A1A1A;">步骤标题</p>
-      <p style="margin:0;font-size:14px;line-height:1.6;color:#4A4A4A;">步骤的详细描述，说明这一步要做什么。</p>
+      <p style="margin:0 0 4px 0;font-size:15px;font-weight:bold;color:#1D1D1F;">步骤标题</p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#6E6E73;">步骤的详细描述，说明这一步要做什么。</p>
     </section>
   </section>
 </section>
@@ -182,7 +178,7 @@
 ```html
 <section style="margin:20px 0;text-align:center;">
   <img src="IMAGE_URL" style="width:100%;border-radius:8px;display:block;" />
-  <p style="margin:8px 0 0 0;font-size:12px;color:#7A7A7A;text-align:center;">图片说明文字 / 来源标注</p>
+  <p style="margin:8px 0 0 0;font-size:12px;color:#A1A1A6;text-align:center;">图片说明文字 / 来源标注</p>
 </section>
 ```
 
@@ -191,11 +187,11 @@
 文章结尾的总结区块，带视觉收束。
 
 ```html
-<section style="margin:32px 0 0 0;padding:20px;background:#F2F2F2;border-radius:8px;">
-  <p style="margin:0 0 12px 0;font-size:15px;font-weight:bold;color:#1A1A1A;">📌 核心要点</p>
-  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#4A4A4A;">1. 要点一</p>
-  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#4A4A4A;">2. 要点二</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#4A4A4A;">3. 要点三</p>
+<section style="margin:32px 0 0 0;padding:20px;background:#F7F7F5;border-radius:8px;border:1px solid #E5E5E5;">
+  <p style="margin:0 0 12px 0;font-size:15px;font-weight:bold;color:#1D1D1F;">核心要点</p>
+  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#6E6E73;">1. 要点一</p>
+  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#6E6E73;">2. 要点二</p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;">3. 要点三</p>
 </section>
 ```
 
@@ -205,9 +201,9 @@
 
 ```html
 <section style="margin:16px 0;display:flex;flex-wrap:wrap;gap:8px;">
-  <span style="display:inline-block;padding:4px 12px;background:#ECFDF5;color:#059669;font-size:12px;border-radius:20px;">标签一</span>
-  <span style="display:inline-block;padding:4px 12px;background:#F2F2F2;color:#4A4A4A;font-size:12px;border-radius:20px;">标签二</span>
-  <span style="display:inline-block;padding:4px 12px;background:#F2F2F2;color:#4A4A4A;font-size:12px;border-radius:20px;">标签三</span>
+  <span style="display:inline-block;padding:4px 12px;background:#FBF8F1;color:#C9A962;font-size:12px;border-radius:20px;">标签一</span>
+  <span style="display:inline-block;padding:4px 12px;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;">标签二</span>
+  <span style="display:inline-block;padding:4px 12px;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;">标签三</span>
 </section>
 ```
 
@@ -223,23 +219,23 @@
 <section style="margin:20px 0;">
   <svg viewBox="0 0 680 260" style="width:100%;display:block;" xmlns="http://www.w3.org/2000/svg">
     <!-- 左卡 -->
-    <rect x="10" y="10" width="320" height="240" rx="12" fill="#F2F2F2"/>
-    <text x="30" y="50" font-size="14" font-weight="bold" fill="#059669">方案 A</text>
-    <text x="30" y="80" font-size="18" font-weight="bold" fill="#1A1A1A">标题一</text>
-    <text x="30" y="110" font-size="13" fill="#4A4A4A">描述文字第一行</text>
-    <text x="30" y="132" font-size="13" fill="#4A4A4A">描述文字第二行</text>
-    <text x="30" y="170" font-size="28" font-weight="bold" fill="#1A1A1A">85%</text>
-    <text x="30" y="192" font-size="12" fill="#7A7A7A">关键指标</text>
+    <rect x="10" y="10" width="320" height="240" rx="12" fill="#FBF8F1" stroke="#C9A962" stroke-width="1"/>
+    <text x="30" y="50" font-size="14" font-weight="bold" fill="#C9A962">方案 A</text>
+    <text x="30" y="80" font-size="18" font-weight="bold" fill="#1D1D1F">标题一</text>
+    <text x="30" y="110" font-size="13" fill="#6E6E73">描述文字第一行</text>
+    <text x="30" y="132" font-size="13" fill="#6E6E73">描述文字第二行</text>
+    <text x="30" y="170" font-size="28" font-weight="bold" fill="#1D1D1F">85%</text>
+    <text x="30" y="192" font-size="12" fill="#A1A1A6">关键指标</text>
     <!-- VS -->
-    <text x="340" y="140" text-anchor="middle" font-size="16" font-weight="bold" fill="#B0B0B0">VS</text>
+    <text x="340" y="140" text-anchor="middle" font-size="16" font-weight="bold" fill="#D0D0D0">VS</text>
     <!-- 右卡 -->
-    <rect x="350" y="10" width="320" height="240" rx="12" fill="#2D2D2D"/>
-    <text x="370" y="50" font-size="14" font-weight="bold" fill="#10B981">方案 B</text>
+    <rect x="350" y="10" width="320" height="240" rx="12" fill="#1D1D1F"/>
+    <text x="370" y="50" font-size="14" font-weight="bold" fill="#C9A962">方案 B</text>
     <text x="370" y="80" font-size="18" font-weight="bold" fill="#FFFFFF">标题二</text>
-    <text x="370" y="110" font-size="13" fill="#B0B0B0">描述文字第一行</text>
-    <text x="370" y="132" font-size="13" fill="#B0B0B0">描述文字第二行</text>
+    <text x="370" y="110" font-size="13" fill="#A1A1A6">描述文字第一行</text>
+    <text x="370" y="132" font-size="13" fill="#A1A1A6">描述文字第二行</text>
     <text x="370" y="170" font-size="28" font-weight="bold" fill="#FFFFFF">92%</text>
-    <text x="370" y="192" font-size="12" fill="#7A7A7A">关键指标</text>
+    <text x="370" y="192" font-size="12" fill="#6E6E73">关键指标</text>
   </svg>
 </section>
 ```
@@ -251,28 +247,23 @@
 ```html
 <section style="margin:20px 0;">
   <svg viewBox="0 0 680 200" style="width:100%;display:block;" xmlns="http://www.w3.org/2000/svg">
-    <!-- 主轴线 -->
-    <line x1="40" y1="100" x2="640" y2="100" stroke="#B0B0B0" stroke-width="2"/>
-    <!-- 节点1 -->
-    <circle cx="120" cy="100" r="12" fill="#059669"/>
-    <text x="120" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#FFFFFF">1</text>
-    <text x="120" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#1A1A1A">阶段一</text>
-    <text x="120" y="135" text-anchor="middle" font-size="11" fill="#7A7A7A">2024.Q1</text>
-    <!-- 节点2 -->
-    <circle cx="300" cy="100" r="12" fill="#059669"/>
-    <text x="300" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#FFFFFF">2</text>
-    <text x="300" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#1A1A1A">阶段二</text>
-    <text x="300" y="135" text-anchor="middle" font-size="11" fill="#7A7A7A">2024.Q3</text>
-    <!-- 节点3 -->
-    <circle cx="480" cy="100" r="12" fill="#059669"/>
-    <text x="480" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#FFFFFF">3</text>
-    <text x="480" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#1A1A1A">阶段三</text>
-    <text x="480" y="135" text-anchor="middle" font-size="11" fill="#7A7A7A">2025.Q1</text>
-    <!-- 当前节点（高亮） -->
-    <circle cx="600" cy="100" r="14" fill="#10B981" stroke="#ECFDF5" stroke-width="3"/>
-    <text x="600" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#FFFFFF">4</text>
-    <text x="600" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#059669">现在</text>
-    <text x="600" y="135" text-anchor="middle" font-size="11" fill="#059669">2026.Q2</text>
+    <line x1="40" y1="100" x2="640" y2="100" stroke="#E5E5E5" stroke-width="2"/>
+    <circle cx="120" cy="100" r="12" fill="#1D1D1F"/>
+    <text x="120" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#C9A962">1</text>
+    <text x="120" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#1D1D1F">阶段一</text>
+    <text x="120" y="135" text-anchor="middle" font-size="11" fill="#A1A1A6">2024.Q1</text>
+    <circle cx="300" cy="100" r="12" fill="#1D1D1F"/>
+    <text x="300" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#C9A962">2</text>
+    <text x="300" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#1D1D1F">阶段二</text>
+    <text x="300" y="135" text-anchor="middle" font-size="11" fill="#A1A1A6">2024.Q3</text>
+    <circle cx="480" cy="100" r="12" fill="#1D1D1F"/>
+    <text x="480" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#C9A962">3</text>
+    <text x="480" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#1D1D1F">阶段三</text>
+    <text x="480" y="135" text-anchor="middle" font-size="11" fill="#A1A1A6">2025.Q1</text>
+    <circle cx="600" cy="100" r="14" fill="#C9A962" stroke="#FBF8F1" stroke-width="3"/>
+    <text x="600" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#1D1D1F">4</text>
+    <text x="600" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#C9A962">现在</text>
+    <text x="600" y="135" text-anchor="middle" font-size="11" fill="#C9A962">2026.Q2</text>
   </svg>
 </section>
 ```
@@ -284,34 +275,24 @@
 ```html
 <section style="margin:20px 0;">
   <svg viewBox="0 0 680 340" style="width:100%;display:block;" xmlns="http://www.w3.org/2000/svg">
-    <!-- 中心圆 -->
-    <circle cx="340" cy="170" r="60" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
-    <text x="340" y="165" text-anchor="middle" font-size="14" font-weight="bold" fill="#059669">核心</text>
-    <text x="340" y="183" text-anchor="middle" font-size="12" fill="#4A4A4A">驱动力</text>
-    <!-- 节点1 - 顶部 -->
-    <rect x="280" y="20" width="120" height="50" rx="8" fill="#2D2D2D"/>
+    <circle cx="340" cy="170" r="60" fill="#FBF8F1" stroke="#C9A962" stroke-width="2"/>
+    <text x="340" y="165" text-anchor="middle" font-size="14" font-weight="bold" fill="#C9A962">核心</text>
+    <text x="340" y="183" text-anchor="middle" font-size="12" fill="#6E6E73">驱动力</text>
+    <rect x="280" y="20" width="120" height="50" rx="8" fill="#1D1D1F"/>
     <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="bold" fill="#FFFFFF">环节一</text>
-    <!-- 节点2 - 右侧 -->
-    <rect x="510" y="140" width="120" height="50" rx="8" fill="#2D2D2D"/>
+    <rect x="510" y="140" width="120" height="50" rx="8" fill="#1D1D1F"/>
     <text x="570" y="170" text-anchor="middle" font-size="13" font-weight="bold" fill="#FFFFFF">环节二</text>
-    <!-- 节点3 - 底部 -->
-    <rect x="280" y="260" width="120" height="50" rx="8" fill="#2D2D2D"/>
+    <rect x="280" y="260" width="120" height="50" rx="8" fill="#1D1D1F"/>
     <text x="340" y="290" text-anchor="middle" font-size="13" font-weight="bold" fill="#FFFFFF">环节三</text>
-    <!-- 节点4 - 左侧 -->
-    <rect x="50" y="140" width="120" height="50" rx="8" fill="#2D2D2D"/>
+    <rect x="50" y="140" width="120" height="50" rx="8" fill="#1D1D1F"/>
     <text x="110" y="170" text-anchor="middle" font-size="13" font-weight="bold" fill="#FFFFFF">环节四</text>
-    <!-- 箭头：1→2 -->
-    <path d="M400,45 Q470,45 510,140" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrowhead)"/>
-    <!-- 箭头：2→3 -->
-    <path d="M570,190 Q570,260 400,275" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrowhead)"/>
-    <!-- 箭头：3→4 -->
-    <path d="M280,285 Q210,285 170,190" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrowhead)"/>
-    <!-- 箭头：4→1 -->
-    <path d="M110,140 Q110,45 280,45" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrowhead)"/>
-    <!-- 箭头定义 -->
+    <path d="M400,45 Q470,45 510,140" fill="none" stroke="#C9A962" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M570,190 Q570,260 400,275" fill="none" stroke="#C9A962" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M280,285 Q210,285 170,190" fill="none" stroke="#C9A962" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <path d="M110,140 Q110,45 280,45" fill="none" stroke="#C9A962" stroke-width="2" marker-end="url(#arrowhead)"/>
     <defs>
       <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-        <polygon points="0 0, 8 3, 0 6" fill="#059669"/>
+        <polygon points="0 0, 8 3, 0 6" fill="#C9A962"/>
       </marker>
     </defs>
   </svg>
