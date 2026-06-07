@@ -43,6 +43,7 @@
 | **ChatGPT** | 新建一个对话，把 `SKILL.md` 文件里的内容全部复制粘贴进去，说"按这个规则帮我写文章"。或者创建 Custom GPT，把整个文件夹传上去当知识库 |
 | **Claude** | 创建 Project，把所有文件丢进 Project 知识库。或者直接粘贴 SKILL.md 到对话开头 |
 | **CodeBuddy** | 说"帮我安装一个 Skill"，它会一步步教你。1 分钟搞定 |
+| **Codex CLI** | 把 `SKILL.md` 和 `references/` 文件夹放到项目里，或者在对话里粘贴 SKILL.md 内容 |
 | **其他 AI** | 都一样——把 `SKILL.md` 的内容粘到对话开头，说"按这个来"就行 |
 
 本质上就是把 SKILL.md 这个文件的内容给你的 AI 读一遍。不管用什么工具，道理一样。
