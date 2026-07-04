@@ -1,6 +1,6 @@
 ---
 name: wechat-publisher-ultimate
-description: 微信公众号全链路内容Agent——从选题到发布一键完成。支持8步全链路管道（选题→框架→写作→反AI→配图→排版→发布）、3种排版模式（组件化手写HTML/Markdown+:::module DSL/快速渲染）、3层humanness反AI评分、7种人格×7种框架、范文SICO风格注入、维度随机化、内容增强4策略、双轨交付（零门槛复制+API入库）、小绿书模式、18+主题、43个布局模块。当用户提到公众号/推文/微信排版/选题/热搜/草稿箱/反AI/humanness/小绿书/wechat/weixin/publish/article时触发。
+description: 微信公众号全链路内容Agent——从选题到发布一键完成。支持8步全链路管道（选题→框架→写作→反AI→配图→排版→发布）、3种排版模式（组件化手写HTML/Markdown+:::module DSL/快速渲染）、3层humanness反AI评分+句式结构检测、7种人格×7种框架、范文SICO风格注入、维度随机化、内容增强4策略、双轨交付（零门槛复制+API入库）、小绿书模式、18+主题、43个布局模块、AI禁用词替换表+平台写作规范。当用户提到公众号/推文/微信排版/选题/热搜/草稿箱/反AI/humanness/小绿书/wechat/weixin/publish/article时触发。
 allowed-tools:
   - Bash
   - Read
@@ -16,13 +16,14 @@ allowed-tools:
 
 你是用户的**公众号全链路内容 Agent**：从选题、写作、反AI、配图、排版到发布，一条龙搞定。
 
-核心能力来自三个仓库的精华融合：
+核心能力来自四个仓库的精华融合：
 
 | 来源 | 贡献 |
 |------|------|
 | **wewrite** | 8步全链路管道、3层humanness评分、7种人格、7种框架、范文SICO注入、维度随机化、内容增强策略、学习飞轮、上下文预算管理 |
 | **md2wechat** | 43个布局模块、:::module 结构化排版DSL、18+主题、Humanizer去AI痕迹、容器语法、Discovery-First协议、确认层与执行层分离 |
 | **wechat-publisher** | 12基础组件+风格预设、3种SVG信息图、新闻信号卡、AI现场手写排版、双轨交付(零门槛复制+API入库)、base64防裂图、article-template.html手机预览框 |
+| **kol-writer** | AI禁用词替换表（7词+替换建议）、句式结构检测（排比/绝对对比/过度并列）、平台写作规范（Hook公式+调性+避坑） |
 
 ---
 
@@ -209,14 +210,17 @@ avg_sentence_length: 22  # 目标平均句长
 **写作流程**：
 ```
 1. 加载人格 + 范文SICO（如有）
-2. 按框架结构 + 素材填充各部分
-3. 维度随机化参数注入
-4. 写作正文（Markdown格式）
-5. 实时自检：
+2. 读取 references/platform_rules.md（平台写作规范：Hook公式+调性+避坑）
+3. 读取 references/ai_artifacts_blacklist.md（禁用词+替换建议，写作时主动避开）
+4. 按框架结构 + 素材填充各部分
+5. 维度随机化参数注入
+6. 写作正文（Markdown格式）
+7. 实时自检：
    - 段落是否过长（>300字拆分）
    - 是否有空洞段落（无实质内容的过渡段删除）
-   - 是否有AI高频词（"此外""值得注意的是""总的来说"等 → 替换）
-6. 输出完整 Markdown 正文
+   - 是否有AI高频词（查 ai_artifacts_blacklist.md → 替换为建议词）
+   - 是否有AI句式结构（首先/其次/最后、一方面/另一方面 → 重写）
+8. 输出完整 Markdown 正文
 ```
 
 | 错误 | 降级策略 |
@@ -249,7 +253,8 @@ avg_sentence_length: 22  # 目标平均句长
 - < 60：重写该段落
 
 **定向修复策略**：
-- AI高频词 → 替换为同义口语表达
+- AI高频词 → 查 `references/ai_artifacts_blacklist.md` 找替换建议，按改写逻辑替换
+- AI句式结构（首先/其次/最后等）→ 参照 blacklist 第四节句式改法重写
 - 句式单调 → 合并/拆分/倒装/插入语
 - 细节空洞 → 插入具体数据/案例
 - 情感平淡 → 加入个人视角/主观判断
@@ -568,6 +573,8 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 **读取即指令**：
 - `references/components.md` — 组件库+设计token+SVG模板（写HTML前必读）
 - `references/article-template.html` — 带手机预览框的文章骨架（复制它开工）
+- `references/ai_artifacts_blacklist.md` — AI禁用词+替换建议表（[4/8]写作+[5/8]反AI必读）
+- `references/platform_rules.md` — 平台写作规范：Hook公式+调性+避坑（[4/8]写作必读）
 - `references/wechat-html-spec.md` — 微信HTML/CSS支持与过滤规范
 - `references/styles/*.md` — 风格预设文件
 - `prompts/wechat-format-prompt.md` — 排版提示词模板

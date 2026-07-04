@@ -17,15 +17,23 @@ logger = logging.getLogger(__name__)
 # ── 统计层 ──────────────────────────────────────────────
 
 FORBIDDEN_WORDS_AI = [
+    # ── 原有禁用词（去重） ──
     "值得注意的是", "总而言之", "综上所述", "不可忽视", "至关重要",
     "不言而喻", "毋庸置疑", "由此可见", "换言之", "与此同时",
     "在此基础上", "从这个角度来看", "需要指出的是", "显而易见",
     "事实上", "实际上", "毋庸置疑地", "不可忽视地",
     "首先其次最后", "一方面另一方面", "此外另外",
-    "值得注意的是", "深入探讨", "全面解析", "深度解读",
+    "深入探讨", "全面解析", "深度解读",
     "前沿技术", "颠覆性", "革命性", "划时代", "跨时代",
     "令人瞩目", "令人惊叹", "令人兴奋", "不可错过",
     "干货", "必读", "必看", "收藏", "转发",
+    # ── 从 kol-writer 吸收的7个漏网词 ──
+    "值得一提的是", "不得不说", "不可否认",
+    "双刃剑", "扮演着重要的角色", "扮演着重要角色",
+    "如前所述", "正如我们所知",
+    # ── 补充高频AI腔 ──
+    "说到底", "往往", "其实", "人性", "道德绑架",
+    "综上所述地", "不可否认地",
 ]
 
 BROKEN_SENTENCE_PATTERNS = [
@@ -50,6 +58,23 @@ SELF_CORRECTION_PATTERNS = [
     r"我想说的是",
     r"换个说法",
 ]
+
+# ── 句式结构检测（从 kol-writer 吸收） ──
+# 这些模式不直接禁用，但在模式层扣分
+
+AI_SENTENCE_STRUCTURES = [
+    # 排比套路：首先…其次…最后（三段式AI最爱）
+    {"pattern": r"首先[\s\S]{2,100}其次[\s\S]{2,100}最后", "name": "三段排比", "penalty": 20},
+    # 绝对对比套路：虽然…但是…平衡
+    {"pattern": r"虽然[\s\S]{2,80}但是[\s\S]{2,80}平衡", "name": "绝对对比", "penalty": 15},
+    # 过度并列：不仅…而且 出现≥2次
+    {"pattern": r"(不仅[\s\S]{2,60}而且)", "name": "过度并列", "penalty": 10, "min_count": 2},
+    # AI式总结：总而言之/综上所述 出现在段首
+    {"pattern": r"^[。\n]*(总而言之|综上所述|由此可见)", "name": "AI总结句", "penalty": 15},
+    # 万能转折：然而值得注意的是
+    {"pattern": r"然而(值得注意|需要指出|不容忽视)", "name": "AI转折", "penalty": 15},
+]
+
 
 WARM_WORDS = [
     "吧", "呢", "嘛", "啊", "哈", "唉", "哎", "哦", "嗯",
@@ -225,6 +250,34 @@ def calculate_pattern_layer(text: str) -> Dict[str, Any]:
     details["correction_count"] = correction_count
     details["correction_score"] = correction_score
     score += correction_score * 0.20
+
+    # ── 句式结构检测（从 kol-writer 吸收） ──
+    structure_penalty = 0
+    structure_hits = []
+    for rule in AI_SENTENCE_STRUCTURES:
+        matches = re.findall(rule["pattern"], text, re.MULTILINE)
+        min_count = rule.get("min_count", 1)
+        if len(matches) >= min_count:
+            structure_penalty += rule["penalty"]
+            structure_hits.append({
+                "name": rule["name"],
+                "count": len(matches),
+                "penalty": rule["penalty"],
+            })
+    structure_score = max(0, 100 - structure_penalty)
+    details["sentence_structure_hits"] = structure_hits
+    details["structure_score"] = structure_score
+    score += structure_score * 0.20
+
+    # 重新归一化权重（现在6项各0.20=1.0 → 改为7项）
+    # 原来: forbidden 0.25 + broken 0.20 + source 0.20 + warm 0.15 + correction 0.20 = 1.0
+    # 现在: forbidden 0.20 + broken 0.15 + source 0.15 + warm 0.15 + correction 0.15 + structure 0.20 = 1.0
+    # 但上面已经按旧权重加了分，需要重新计算
+    # 实际上上面是累加的，我们需要重新调整
+    # 为了不破坏现有逻辑，结构检测作为额外扣分项
+    # 从总分中扣除结构惩罚的比例
+    structure_deduction = structure_penalty * 0.15  # 结构问题最多扣15%总分
+    score = max(0, score - structure_deduction)
 
     return {"score": round(score, 2), "details": details}
 
