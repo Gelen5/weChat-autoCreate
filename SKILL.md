@@ -341,7 +341,11 @@ avg_sentence_length: 22  # 目标平均句长
 
 ### [7/8] 排版
 
-**目标**：将Markdown正文转化为微信公众号合规HTML。
+**目标**：将Markdown正文转化为微信公众号合规HTML，并通过移动端排版质量门禁。
+
+**排版前必读**：
+- `references/mobile-layout-quality.md` — 首屏信息单元、装饰预算、移动端断行、证据型配图表、反馈路由、发布前检查。
+- `references/wechat-html-spec.md` — 微信HTML/CSS兼容规则。
 
 **三种排版模式**：
 
@@ -351,21 +355,29 @@ AI根据组件库为每篇文章**现场设计**排版——不是套模板，�
 
 ```
 流程：
-1. 读取 references/components.md（12基础组件库）
-2. 读取 references/article-template.html（骨架模板）
-3. 如用户指定风格或内容匹配，读取 references/styles/ 下对应预设
-4. 复制 article-template.html 到输出目录
-5. 在 <!-- ARTICLE HTML START --> / <!-- ARTICLE HTML END --> 之间填入内容
-6. 为每段内容选择合适的组件：
-   - 标题区 → 封面卡 + 标签chips
+1. 读取 references/mobile-layout-quality.md（移动端排版质量门禁）
+2. 读取 references/components.md（12基础组件库）
+3. 读取 references/article-template.html（骨架模板）
+4. 如用户指定风格或内容匹配，读取 references/styles/ 下对应预设
+5. 复制 article-template.html 到输出目录
+6. 先写排版决策卡：
+   - 首屏信息单元：刊头/日期、主标题、识别资产、副标题、编者按、短开场、完整重点句
+   - 装饰预算：预计使用哪些边框/分隔线/色块/药丸标签，强视觉锚点不超过5处
+   - 证据型配图表：每张图证明哪句话、来源/生成计划、拼图结构、图注
+   - 断行风险：标题/金句是否可能出现2-3字孤行，是否需要改写
+7. 在 <!-- ARTICLE HTML START --> / <!-- ARTICLE HTML END --> 之间填入内容
+8. 为每段内容选择合适的组件：
+   - 首屏 → 一套完整题图卡，不叠加目录墙/标签墙/第二张卡
    - 核心论点 → callout框 / 金句框
    - 列表/步骤 → 步骤卡 / 编号小标题
    - 数据 → SVG信息图（对比图/时间线/飞轮图/曲线图）
+   - 案例/图片 → 证据图 + 图注，必要时预合成静态拼图
    - 结尾 → 文末总结块 + 互动引导
-7. 全程内联样式，不用class/id
-8. 一篇挑3-5种组件循环使用
-9. CSS随机扰动（可选）：字号±1px、间距±2px、行高±0.05，消除模板感
-10. 暗黑模式（可选）：生成暗色版本，prefers-color-scheme适配
+9. 全程内联样式，不用class/id
+10. 一篇挑3-5种组件循环使用，但避免为了展示组件而堆组件
+11. CSS随机扰动（可选）：字号±1px、间距±2px、行高±0.05；若质检发现错乱，关闭扰动
+12. 暗黑模式（可选）：生成暗色版本，prefers-color-scheme适配
+13. 运行 `python scripts/layout_quality_check.py <文章.html>`，按 findings 修复后再交付
 ```
 
 **组件库**（12基础组件）：
@@ -463,6 +475,9 @@ cd {skill_dir}/scripts && npx tsx render.ts <文章.md>
 | SVG渲染异常 | 替换为文字描述+占位 |
 | CSS随机扰动导致排版错乱 | 关闭扰动，使用固定值 |
 | 暗黑模式生成失败 | 只交付亮色版本 |
+| layout_quality_check 报 decoration_overload | 删除无功能横线/竖线/边框，改用标题层级和留白 |
+| layout_quality_check 报 image_caption_gap | 补图注或证据说明；无证据价值的图片直接删掉 |
+| layout_quality_check 报 heading_short_tail_risk | 改写标题或按完整语义分行，不用空格硬凑 |
 
 ---
 
@@ -642,7 +657,7 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 用户也可主动触发学习：
 - "学习我的修改" — 从用户修改后的文章提取风格偏好
 - "导入范文" — 从范文提取SICO结构
-- "学习排版" — 从用户提供的排版HTML提取组件偏好
+- "学习排版" — 从用户提供的排版HTML提取组件偏好，并按 `mobile-layout-quality.md` 将反馈归类为层级/间距/装饰/文字/强调/图片/兼容/回滚
 
 ---
 
@@ -680,6 +695,7 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 | `Body image too large` | [8/8] | 正文图超1MB，压缩后重试 |
 | `No title found` | [8/8] | 传 `--title` 或HTML中放 `<h1>` |
 | `HTML file looks like a full document` | [7/8] | 加 `<!-- ARTICLE HTML START/END -->` 标记 |
+| `layout_quality_check` 出现 warnings | [7/8] | 按 `mobile-layout-quality.md` 修复首屏、装饰、断行、图注或图片路径 |
 | Python not found | [5/8] | 跳过humanizer评分，用LLM自评 |
 | npm install failed | [1/8] | 提示用户手动安装，仅使用模式A |
 | WebSearch rate limited | [2/8] | 减少数据源数量，至少保留2个 |
