@@ -736,6 +736,17 @@ python -m toolkit.cli tie-tu validate card_plan.json
 python -m toolkit.cli tie-tu publish card_plan.json
 ```
 
+Runtime compatibility: the core workflow is host-model first and works with
+WorkBuddy, Claude Code, Codex, ChatGPT and other agents that can read this skill
+and run Python. Topic planning, writing, anti-AI review, Tie-Tu planning,
+portrait prompts, reference-image measurement, local validation and preview do
+not require an API key. `OPENAI_API_KEY` is optional and only enables an
+independent L3 second check. Local code-driven image generation needs a key for
+the selected provider, unless the host AI generates the image and it is passed
+to `tie-tu pilot --image`; WeChat draft-box publishing separately needs WeChat
+credentials. See `references/runtime-compatibility.md` for the capability
+matrix. Never paste secrets into the conversation.
+
 The shared protocol commands are also available:
 
 ```bash
