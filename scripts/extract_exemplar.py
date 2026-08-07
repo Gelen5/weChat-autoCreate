@@ -7,6 +7,7 @@ import math
 import re
 import sys
 import logging
+import statistics
 from typing import List, Dict, Any, Optional
 from collections import Counter
 
@@ -144,6 +145,50 @@ def analyze_rhetoric(text: str) -> Dict[str, Any]:
     return rhetoric
 
 
+def build_structure_fingerprint(text: str) -> Dict[str, Any]:
+    """Return reusable structure signals without copying the source wording."""
+    sentences = split_sentences(text)
+    paragraphs = split_paragraphs(text)
+    lengths = [len(item) for item in sentences]
+    paragraph_lengths = [len(item) for item in paragraphs]
+    heading_count = len(re.findall(r"(?m)^#{1,6}\s+", text))
+    first_person = len(re.findall(r"我|我的|我们", text))
+    second_person = len(re.findall(r"你|你的|大家", text))
+    opening = paragraphs[0][:80] if paragraphs else ""
+    ending = paragraphs[-1][-80:] if paragraphs else ""
+    if re.search(r"(前几天|记得|有一次|那天)", opening):
+        opening_type = "scene_or_story"
+    elif "？" in opening or "吗" in opening:
+        opening_type = "question"
+    elif re.search(r"\d", opening):
+        opening_type = "data_or_fact"
+    else:
+        opening_type = "direct_statement"
+    if re.search(r"(总之|最后|回到|所以)", ending):
+        ending_type = "summary_or_action"
+    elif re.search(r"(想起|希望|愿意|记住)", ending):
+        ending_type = "emotional_echo"
+    else:
+        ending_type = "open_ended"
+    return {
+        "paragraph_count": len(paragraphs),
+        "heading_count": heading_count,
+        "sentence_count": len(sentences),
+        "sentence_length_mean": round(statistics.mean(lengths), 2) if lengths else 0,
+        "sentence_length_stddev": round(statistics.pstdev(lengths), 2) if len(lengths) > 1 else 0,
+        "paragraph_length_mean": round(statistics.mean(paragraph_lengths), 2) if paragraph_lengths else 0,
+        "paragraph_length_range": (max(paragraph_lengths) - min(paragraph_lengths)) if paragraph_lengths else 0,
+        "opening_type": opening_type,
+        "ending_type": ending_type,
+        "first_person_density": round(first_person / max(len(text), 1), 4),
+        "second_person_density": round(second_person / max(len(text), 1), 4),
+        "question_count": text.count("？") + text.count("吗"),
+        "quote_count": len(re.findall(r'[“「\"]', text)),
+        "transition_signals": sorted(set(re.findall(r"(?:不过|但|可|说到底|换句话说|话说回来|对了|所以)", text))),
+        "source_signals": len(re.findall(r"https?://|据.{1,8}(?:报道|表示|数据显示)|根据.{1,8}(?:研究|报告)", text)),
+    }
+
+
 def auto_classify(fingerprint: Dict[str, Any]) -> str:
     """自动分类文体"""
     avg_sent_len = fingerprint.get("sentence", {}).get("avg_length", 20)
@@ -191,13 +236,14 @@ def generate_sico_prompts(text: str, fingerprint: Dict[str, Any]) -> Dict[str, s
 句长分布：{json.dumps(fingerprint.get('sentence', {}).get('length_distribution', {}), ensure_ascii=False)}
 情感倾向：{'积极' if fingerprint.get('vocabulary', {}).get('sentiment_ratio', 0.5) > 0.6 else '中性/批判'}
 修辞偏好：设问{fingerprint.get('rhetoric', {}).get('rhetorical_questions', 0)}次，比喻{fingerprint.get('rhetoric', {}).get('metaphors', 0)}次，排比{fingerprint.get('rhetoric', {}).get('parallelism', 0)}次
+结构指纹：{json.dumps(fingerprint.get('structure', {}), ensure_ascii=False)}
 
 风格样本：
 1. {exemplars[0] if len(exemplars) > 0 else ''}
 2. {exemplars[1] if len(exemplars) > 1 else ''}
 3. {exemplars[2] if len(exemplars) > 2 else ''}
 
-请严格模仿以上风格特征进行写作。""",
+请学习以上结构、节奏和修辞倾向，但不要复制样本文句；没有真实依据时不要伪造第一人称经历、数据或来源。""",
         "exemplars": exemplars,
     }
 
@@ -214,7 +260,7 @@ def main():
     if args.text:
         text = args.text
     elif args.file:
-        with open(args.file, "r", encoding="utf-8") as f:
+        with open(args.file, "r", encoding="utf-8-sig") as f:
             text = f.read()
     else:
         text = sys.stdin.read()
@@ -229,6 +275,7 @@ def main():
         "paragraph": analyze_paragraph_patterns(text),
         "vocabulary": analyze_vocabulary(text),
         "rhetoric": analyze_rhetoric(text),
+        "structure": build_structure_fingerprint(text),
     }
 
     # 自动分类

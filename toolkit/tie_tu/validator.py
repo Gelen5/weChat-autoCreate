@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from .models import TieTuPlan
+from .workflow import validate_card_briefs
 
 
 def _image_size(path: Path):
@@ -22,8 +23,8 @@ def validate_plan(plan: TieTuPlan) -> Dict[str, Any]:
     warnings = []
     if plan.mode != "tie_tu":
         errors.append("mode 必须为 tie_tu")
-    if not 1 <= len(plan.cards) <= 20:
-        errors.append("图片卡片数量必须在 1 到 20 张之间")
+    if len(plan.cards) < 1:
+        errors.append("贴图号至少需要 1 张卡片；不设置图片数量上限")
     if plan.ratio != "3:4":
         warnings.append("建议使用 3:4 竖幅贴图比例")
     if len(plan.copy) > 300:
@@ -49,4 +50,11 @@ def validate_plan(plan: TieTuPlan) -> Dict[str, Any]:
     portrait_report = validate_portrait_plan(plan)
     errors.extend(portrait_report["errors"])
     warnings.extend(portrait_report["warnings"])
+    brief_report = validate_card_briefs(plan)
+    errors.extend(brief_report["errors"])
+    warnings.extend(brief_report["warnings"])
+    plan.quality_gate.findings = [
+        {"check": "card_briefs", "passed": brief_report["ok"], "detail": "; ".join(brief_report["errors"] + brief_report["warnings"])}
+    ]
+    plan.quality_gate.status = "passed" if not errors else "failed"
     return {"ok": not errors, "errors": errors, "warnings": warnings}

@@ -26,8 +26,9 @@ class TieTuWorkflowTests(unittest.TestCase):
         self.assertIn("watermark", plan.cards[0].portrait_spec["negative_prompt"])
         self.assertIn("same fictional adult model", plan.model_bible["continuity"])
         self.assertIn("3:4 vertical", render_portrait_prompt(plan.cards[0].portrait_spec))
+        self.assertEqual(len(build_plan("AI", "主题", image_count=21).cards), 21)
         with self.assertRaises(ValueError):
-            build_plan("AI", "主题", image_count=21)
+            build_plan("AI", "主题", image_count=0)
 
     def test_preview_and_validation(self):
         plan = build_plan("职场", "新人入职清单", content_type="list", image_count=3)

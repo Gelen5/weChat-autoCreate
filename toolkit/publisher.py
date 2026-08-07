@@ -13,6 +13,7 @@ from .config import get_config
 from .converter import MarkdownConverter
 from .theme import load_theme, apply_theme
 from .wechat_api import WeChatAPI
+from .briefs import build_article_brief
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,10 @@ class Publisher:
         if not os.path.exists(file_path):
             logger.error(f"文件不存在: {file_path}")
             return None
+
+        # Long-form publishing participates in the shared ContentBrief
+        # protocol while keeping the existing rendering and API path intact.
+        self.last_brief = build_article_brief(file_path)
 
         # 读取文件
         ext = os.path.splitext(file_path)[1].lower()

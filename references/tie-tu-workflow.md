@@ -37,7 +37,7 @@
 | `city_change` | 城市变化型 | 封面 → 旧景 → 今景 → 对比 → 记忆 |
 | `emotional_story` | 情绪故事型 | 封面 → 场景 → 细节 → 转折 → 结尾 |
 
-默认图片数量为 5 张，允许 1–20 张；默认比例为 3:4。
+默认图片数量为 5 张，至少 1 张，不设置上限；默认比例为 3:4。
 
 ## 人像增强分支
 
@@ -53,3 +53,17 @@ python -m toolkit.cli tie-tu validate card_plan.json
 ```
 
 需要关闭时使用 `--portrait-mode off`；需要对没有明显关键词的主题强制使用时使用 `--portrait-mode required`。图片生成器应读取每张卡片的 `portrait_spec`，中文文字继续由贴图号渲染器后期叠加，不交给图片模型生成。
+
+## 状态、来源与生成
+
+每个计划都包含统一的 `ContentBrief`、`SourceLedger`、`ApprovalState`、`QualityGate`，并额外记录 `GenerationState`。来源可以通过 CLI 补充：
+
+```bash
+python -m toolkit.cli tie-tu source card_plan.json --source-id source-1 --kind web --title "来源标题" --url "https://example.com" --status verified
+python -m toolkit.cli tie-tu approve card_plan.json --stage card_plan --status approved
+python -m toolkit.cli tie-tu pilot card_plan.json --image ./assets/pilot.png
+python -m toolkit.cli tie-tu batch card_plan.json --output-dir ./output/tie-tu
+python -m toolkit.cli tie-tu status card_plan.json
+```
+
+`pilot` 可以记录已有试生成图片，也可以在配置图片提供商后调用现有 `ImageGenerator`；`batch` 只生成尚未有图片路径的卡片。所有生成方式、来源和审批状态都会写回 `card_plan.json`。

@@ -212,6 +212,88 @@ def cmd_tie_tu_publish(args):
     return 1
 
 
+def cmd_tie_tu_status(args):
+    from .tie_tu import load_plan
+    plan = load_plan(args.plan)
+    print(json.dumps({
+        "approval": plan.approval_state.stages,
+        "generation": {
+            "pilot_card": plan.generation_state.pilot_card,
+            "pilot_status": plan.generation_state.pilot_status,
+            "batch_status": plan.generation_state.batch_status,
+            "cards": plan.generation_state.cards,
+            "last_error": plan.generation_state.last_error,
+        },
+        "quality_gate": plan.quality_gate.__dict__,
+    }, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_tie_tu_approve(args):
+    from .tie_tu import load_plan, save_plan, set_approval
+    plan = load_plan(args.plan)
+    set_approval(plan, args.stage, args.status, args.note or "")
+    save_plan(plan, args.plan)
+    print(f"贴图号审批状态已更新: {args.stage}={args.status}")
+    return 0
+
+
+def cmd_tie_tu_source(args):
+    from .tie_tu import add_source, load_plan, save_plan
+    plan = load_plan(args.plan)
+    add_source(plan, args.source_id, args.kind, args.title or "", args.url or "", args.evidence or "", args.status, args.license or "")
+    save_plan(plan, args.plan)
+    print(f"贴图号来源已记录: {args.source_id}")
+    return 0
+
+
+def cmd_tie_tu_pilot(args):
+    from .tie_tu import generate_pilot, load_plan, record_pilot, save_plan
+    plan = load_plan(args.plan)
+    if args.image:
+        record_pilot(plan, args.index, args.image, "generated")
+    else:
+        path = generate_pilot(plan, args.output_dir, args.provider)
+        if not path:
+            save_plan(plan, args.plan)
+            print("第一张试生成失败", file=sys.stderr)
+            return 1
+        print(f"第一张试生成完成: {path}")
+    save_plan(plan, args.plan)
+    return 0
+
+
+def cmd_tie_tu_batch(args):
+    from .tie_tu import generate_batch, load_plan, save_plan
+    plan = load_plan(args.plan)
+    count = generate_batch(plan, args.output_dir, args.provider)
+    save_plan(plan, args.plan)
+    print(f"贴图号批量生成完成: {count}/{len(plan.cards)}")
+    return 0 if count == len(plan.cards) else 1
+
+
+def cmd_tie_tu_reverse_image(args):
+    from .tie_tu import attach_reference_analysis, load_plan, save_plan
+    plan = load_plan(args.plan)
+    analysis = attach_reference_analysis(plan, args.image)
+    save_plan(plan, args.plan)
+    print(json.dumps(analysis, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_brief(args):
+    from .briefs import build_article_brief
+    brief = build_article_brief(args.file)
+    payload = json.dumps(brief.to_dict(), ensure_ascii=False, indent=2)
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(payload)
+        print(f"ContentBrief 已生成: {args.output}")
+    else:
+        print(payload)
+    return 0
+
+
 def cmd_learn_theme(args):
     """从URL学习排版主题"""
     # 调用learn_theme脚本
@@ -269,7 +351,7 @@ def main():
     tie_tu_plan.add_argument("--content-type", choices=[
         "tutorial", "before_after", "list", "industry_view", "city_change", "emotional_story"
     ])
-    tie_tu_plan.add_argument("--count", type=int, default=5, help="图片数量，1-20")
+    tie_tu_plan.add_argument("--count", type=int, default=5, help="图片数量，至少1张，不设上限")
     tie_tu_plan.add_argument("--style", help="视觉风格")
     tie_tu_plan.add_argument("--audience", help="目标读者")
     tie_tu_plan.add_argument("--portrait-mode", choices=["auto", "required", "off"], default="auto", help="人像增强：自动、强制或关闭")
@@ -289,6 +371,45 @@ def main():
 
     tie_tu_publish = tie_tu_sub.add_parser("publish", help="将贴图号写入公众号草稿箱")
     tie_tu_publish.add_argument("plan", help="card_plan.json")
+
+    tie_tu_status = tie_tu_sub.add_parser("status", help="查看贴图号审批、生成和质量状态")
+    tie_tu_status.add_argument("plan", help="card_plan.json")
+
+    tie_tu_approve = tie_tu_sub.add_parser("approve", help="更新贴图号流程审批状态")
+    tie_tu_approve.add_argument("plan", help="card_plan.json")
+    tie_tu_approve.add_argument("--stage", required=True, choices=["topic", "brief", "card_plan", "pilot_image", "batch_generation", "preview", "publish"])
+    tie_tu_approve.add_argument("--status", required=True, choices=["pending", "approved", "rejected", "blocked"])
+    tie_tu_approve.add_argument("--note", help="备注")
+
+    tie_tu_source = tie_tu_sub.add_parser("source", help="为贴图号记录来源账本条目")
+    tie_tu_source.add_argument("plan", help="card_plan.json")
+    tie_tu_source.add_argument("--source-id", required=True)
+    tie_tu_source.add_argument("--kind", required=True, choices=["web", "user", "ai", "reference", "claim"])
+    tie_tu_source.add_argument("--title")
+    tie_tu_source.add_argument("--url")
+    tie_tu_source.add_argument("--evidence")
+    tie_tu_source.add_argument("--status", choices=["verified", "illustrative", "unverified", "rejected"], default="unverified")
+    tie_tu_source.add_argument("--license")
+
+    tie_tu_pilot = tie_tu_sub.add_parser("pilot", help="生成或记录第一张试生成图片")
+    tie_tu_pilot.add_argument("plan", help="card_plan.json")
+    tie_tu_pilot.add_argument("--index", type=int, default=1)
+    tie_tu_pilot.add_argument("--image", help="已有试生成图片路径；不填则调用图片生成器")
+    tie_tu_pilot.add_argument("--provider")
+    tie_tu_pilot.add_argument("--output-dir", default="./output/tie-tu-pilot")
+
+    tie_tu_batch = tie_tu_sub.add_parser("batch", help="批量生成未完成的贴图号图片")
+    tie_tu_batch.add_argument("plan", help="card_plan.json")
+    tie_tu_batch.add_argument("--provider")
+    tie_tu_batch.add_argument("--output-dir", default="./output/tie-tu-batch")
+
+    tie_tu_reverse = tie_tu_sub.add_parser("reverse-image", help="测量参考图比例、色板和基础版式信息")
+    tie_tu_reverse.add_argument("plan", help="card_plan.json")
+    tie_tu_reverse.add_argument("--image", required=True, help="参考图片路径")
+
+    brief_parser = subparsers.add_parser("brief", help="为长文生成统一 ContentBrief")
+    brief_parser.add_argument("file", help="Markdown文章文件")
+    brief_parser.add_argument("--output", "-o", help="输出JSON路径")
 
     # themes
     themes_parser = subparsers.add_parser("themes", help="列出可用主题")
@@ -312,6 +433,7 @@ def main():
         "image-post": cmd_image_post,
         "themes": cmd_themes,
         "learn-theme": cmd_learn_theme,
+        "brief": cmd_brief,
     }
 
     if args.command == "tie-tu":
@@ -321,6 +443,12 @@ def main():
             "validate": cmd_tie_tu_validate,
             "portrait-prompt": cmd_tie_tu_portrait_prompt,
             "publish": cmd_tie_tu_publish,
+            "status": cmd_tie_tu_status,
+            "approve": cmd_tie_tu_approve,
+            "source": cmd_tie_tu_source,
+            "pilot": cmd_tie_tu_pilot,
+            "batch": cmd_tie_tu_batch,
+            "reverse-image": cmd_tie_tu_reverse_image,
         }
         handler = tie_tu_handlers.get(args.tie_tu_command)
         return handler(args) if handler else 1

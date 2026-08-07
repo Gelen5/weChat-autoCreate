@@ -10,6 +10,8 @@ from __future__ import annotations
 from typing import Dict, List
 
 from .models import CONTENT_TYPES, CardPlan, TieTuPlan
+from ..briefs import build_tie_tu_brief
+from ..contracts import QualityGate, SourceLedger, SourceRecord
 
 
 TYPE_KEYWORDS: Dict[str, tuple[str, ...]] = {
@@ -96,8 +98,8 @@ def build_plan(
     audience: str = "",
     portrait_mode: str = "auto",
 ) -> TieTuPlan:
-    if not 1 <= image_count <= 20:
-        raise ValueError("贴图号图片数量必须在 1 到 20 张之间")
+    if image_count < 1:
+        raise ValueError("贴图号图片数量必须至少为 1 张；不设置上限")
     if portrait_mode not in {"auto", "required", "off"}:
         raise ValueError("portrait_mode 必须是 auto、required 或 off")
 
@@ -116,8 +118,16 @@ def build_plan(
             composition="3:4 竖幅，主体明确，预留文字安全区，避免文字遮挡主体",
             overlay_text="",
             caption="",
+            card_brief={
+                "message": purpose,
+                "visual_proof": f"画面需要让读者看见：{label}",
+                "text_plan": "文字由贴图号渲染器后期叠加，图片模型不生成文字",
+                "source_plan": "记录用户素材、公开来源或AI生成方式",
+            },
+            quality_gate=QualityGate("card", ["single_visual_focus", "asset_exists", "ratio", "text_safe_area"]),
         ))
 
+    brief = build_tie_tu_brief(industry, topic, title or topic, selected, audience, style)
     plan = TieTuPlan(
         industry=industry,
         topic=topic,
@@ -129,6 +139,8 @@ def build_plan(
         style=style,
         cards=cards,
         portrait_mode=portrait_mode,
+        content_brief=brief,
+        source_ledger=SourceLedger(),
         research_notes=["这是结构化策划草案；热点、事实和图片来源由上层 Skill 补充。"],
     )
     if portrait_mode != "off":

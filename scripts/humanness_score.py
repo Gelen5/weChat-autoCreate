@@ -14,6 +14,12 @@ from typing import List, Dict, Any, Tuple, Optional
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
+LAYER_WEIGHTS = {
+    "statistical": 0.50,
+    "pattern": 0.30,
+    "llm": 0.20,
+}
+
 # ── 统计层 ──────────────────────────────────────────────
 
 FORBIDDEN_WORDS_AI = [
@@ -301,9 +307,16 @@ def calculate_llm_layer(text: str, api_key: Optional[str] = None,
         try:
             score = float(host_score.get("score", 50))
             reason = str(host_score.get("reason", ""))
+            dimensions = host_score.get("dimensions", {}) if isinstance(host_score, dict) else {}
             return {
                 "score": max(0.0, min(100.0, score)),
-                "details": {"reason": reason, "skipped": False, "grader": "host-model"},
+                "details": {
+                    "reason": reason,
+                    "dimensions": dimensions,
+                    "skipped": False,
+                    "status": "scored",
+                    "grader": "host-model",
+                },
             }
         except (ValueError, AttributeError, TypeError):
             logger.warning("host_score 格式非法，忽略，尝试下一模式")
@@ -313,8 +326,10 @@ def calculate_llm_layer(text: str, api_key: Optional[str] = None,
         try:
             import requests as req
 
-            prompt = f"""请判断以下中文文章是否像AI生成的。评分0-100，100=完全像人类，0=完全像AI。
-只返回一个JSON：{{"score": 数字, "reason": "简短理由"}}
+            prompt = f"""请作为内容质量阅卷老师评估以下中文文章的语义人性化程度。
+请从观点原创性、细节具体性、情感真实性三个维度判断，输出0-100分。
+不要因为文章使用了规范结构就直接判定为AI，也不要把无法验证的虚构经历当作真实。
+只返回一个JSON：{{"score": 数字, "reason": "简短理由", "dimensions": {{"originality": 数字, "specificity": 数字, "emotion": 数字}}}}
 
 文章：
 {text[:2000]}"""
@@ -339,12 +354,41 @@ def calculate_llm_layer(text: str, api_key: Optional[str] = None,
                 result = json.loads(match.group())
                 return {
                     "score": result.get("score", 50),
-                    "details": {"reason": result.get("reason", ""), "skipped": False, "grader": "openai"},
+                    "details": {"reason": result.get("reason", ""), "dimensions": result.get("dimensions", {}), "skipped": False, "status": "scored", "grader": "openai"},
                 }
         except Exception as e:
             logger.warning(f"LLM评分失败: {e}")
 
-    return {"score": 50, "details": {"skipped": True, "reason": "No host score and no API key"}}
+    return {"score": 50, "details": {"skipped": True, "status": "unavailable", "reason": "No host score and no API key", "effective_fallback": 50}}
+
+
+def build_repair_plan(stat_result: Dict[str, Any], pattern_result: Dict[str, Any],
+                      llm_result: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Turn score evidence into concrete revision actions."""
+    actions: List[Dict[str, str]] = []
+    stat = stat_result.get("details", {})
+    pattern = pattern_result.get("details", {})
+    if stat.get("sent_stddev", 0) < 5 or stat.get("sent_range", 0) < 15:
+        actions.append({"layer": "statistical", "action": "打散句长", "reason": "句长变化不足，合并部分短句并补充一处具体细节。"})
+    if stat.get("ttr", 1) < 0.35:
+        actions.append({"layer": "statistical", "action": "降低词汇重复", "reason": "词汇丰富度偏低，替换重复名词和同构表达。"})
+    if pattern.get("forbidden_words_count", 0) > 0:
+        actions.append({"layer": "pattern", "action": "替换AI高频词", "reason": f"命中{pattern['forbidden_words_count']}个禁用表达。"})
+    if pattern.get("structure_score", 100) < 90:
+        actions.append({"layer": "pattern", "action": "重写套路句式", "reason": "存在排比、万能转折或模板化总结结构。"})
+    if pattern.get("warm_word_count", 0) == 0:
+        actions.append({"layer": "pattern", "action": "补充作者视角", "reason": "全文缺少自然的主观判断或对话感。"})
+    if llm_result.get("details", {}).get("status") == "unavailable":
+        actions.append({"layer": "llm", "action": "补充L3阅卷", "reason": "当前没有宿主评分或独立LLM评分，语义层只使用回退分。"})
+    else:
+        dimensions = llm_result.get("details", {}).get("dimensions", {})
+        if dimensions.get("originality", 100) < 60:
+            actions.append({"layer": "llm", "action": "明确原创判断", "reason": "观点仍停留在通用结论，补充独立立场和取舍。"})
+        if dimensions.get("specificity", 100) < 60:
+            actions.append({"layer": "llm", "action": "补充可核验细节", "reason": "缺少具体事实、案例、时间或场景。"})
+        if dimensions.get("emotion", 100) < 60:
+            actions.append({"layer": "llm", "action": "增加真实情绪来源", "reason": "情绪表达较抽象，需要绑定人物、场景或具体感受。"})
+    return actions
 
 
 def bell_curve_calibration(score: float) -> float:
@@ -374,7 +418,7 @@ def main():
     if args.text:
         text = args.text
     elif args.file:
-        with open(args.file, "r", encoding="utf-8") as f:
+        with open(args.file, "r", encoding="utf-8-sig") as f:
             text = f.read()
     else:
         text = sys.stdin.read()
@@ -396,7 +440,7 @@ def main():
             logger.warning("tier3-json 解析失败，忽略")
     elif args.tier3_file:
         try:
-            with open(args.tier3_file, "r", encoding="utf-8") as f:
+            with open(args.tier3_file, "r", encoding="utf-8-sig") as f:
                 host_score = json.load(f)
         except Exception as e:
             logger.warning(f"tier3-file 读取失败: {e}")
@@ -408,14 +452,14 @@ def main():
     if tier3_enabled:
         llm_result = calculate_llm_layer(text, api_key=api_key, host_score=host_score)
     else:
-        llm_result = {"score": 50, "details": {"skipped": True, "reason": "Disabled by --no-tier3"}}
+        llm_result = {"score": 50, "details": {"skipped": True, "status": "disabled", "reason": "Disabled by --no-tier3", "effective_fallback": 50}}
 
     # 加权汇总
-    raw_score = (
-        stat_result["score"] * 0.50
-        + pattern_result["score"] * 0.30
-        + llm_result["score"] * 0.20
-    )
+    raw_score = sum((
+        stat_result["score"] * LAYER_WEIGHTS["statistical"],
+        pattern_result["score"] * LAYER_WEIGHTS["pattern"],
+        llm_result["score"] * LAYER_WEIGHTS["llm"],
+    ))
 
     # 钟形曲线校准
     final_score = raw_score if args.no_calibration else bell_curve_calibration(raw_score)
@@ -428,6 +472,8 @@ def main():
             "pattern": pattern_result,
             "llm": llm_result,
         },
+        "weights": LAYER_WEIGHTS,
+        "repair_plan": build_repair_plan(stat_result, pattern_result, llm_result),
         "calibrated": not args.no_calibration,
     }
 

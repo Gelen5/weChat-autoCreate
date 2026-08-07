@@ -239,19 +239,20 @@ avg_sentence_length: 22  # 目标平均句长
 
 **目标**：消除AI写作痕迹，优化SEO。
 
-**3层humanness评分**：
+**3层humanness评分**（代码和输出统一使用 50% / 30% / 20%）：
 
 | 层级 | 检查项 | 权重 | 评分 |
 |------|--------|------|------|
-| L1 词汇层 | AI高频词密度、用词多样性(TTR)、口语化程度 | 30% | 0-100 |
-| L2 句法层 | 句长分布自然度、句式多样性、过渡词自然度 | 40% | 0-100 |
-| L3 语义层 | 观点原创性、细节具体性、情感真实性 | 30% | 0-100 |
+| L1 统计层 | 句长波动、词汇丰富度、段落差异、副词密度 | 50% | 0-100 |
+| L2 模式层 | 禁用词、句式套路、暖词、真实来源和自我修正 | 30% | 0-100 |
+| L3 语义层 | 观点原创性、细节具体性、情感真实性 | 20% | 0-100 |
 
 **L3 阅卷老师 = 当前宿主主模型（默认模式，零配置）**：
 - 谁在跑这个 skill，谁就是 L3 的阅卷老师——WorkBuddy 里用 WorkBuddy 当前选中的模型，Codex 里用 GPT，Claude 里用 Claude，自动适配任意宿主。
 - 主模型按 L3 标准（观点原创性 / 细节具体性 / 情感真实性）在对话中产出 `{"score":0-100, "reason":"简短理由"}`，通过 `--tier3-json` 或 `--tier3-file` 喂给 `humanness_score.py` 汇总加权。
 - **无需任何 API key**，不再依赖 OpenAI。
 - 可选增强：配置 `OPENAI_API_KEY` 后，脚本会用 gpt-4o-mini 做一次独立二次校验（结果以 `grader` 字段区分 host/openai）。
+- L3 缺考不会伪装成正常评分：报告会写明 `status=unavailable`，并保留 50 分回退值和修复建议。
 
 **评分阈值**：
 - 综合 ≥ 75：通过
@@ -524,7 +525,7 @@ cd {skill_dir}/scripts && npx tsx publish.ts <文章.html> \
 **多图文**：支持多篇文章批量发布为一条多图文消息。
 
 **小绿书模式**：
-- 图片为主（3-9张）+ 短文案（<300字）
+- 图片为主（至少1张，不设数量上限）+ 短文案（<300字）
 - 自动生成带文字叠加的图片
 - 发布到"小绿书"版块
 - 触发词："小绿书"/"图文笔记"
@@ -702,7 +703,7 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 | `No title found` | [8/8] | 传 `--title` 或HTML中放 `<h1>` |
 | `HTML file looks like a full document` | [7/8] | 加 `<!-- ARTICLE HTML START/END -->` 标记 |
 | `layout_quality_check` 出现 warnings | [7/8] | 按 `mobile-layout-quality.md` 修复首屏、装饰、断行、图注或图片路径 |
-| Python not found | [5/8] | 跳过humanizer评分，用LLM自评 |
+| Python not found | [5/8] | 使用宿主模型按 L3 规则阅卷；无法阅卷时标记 unavailable |
 | npm install failed | [1/8] | 提示用户手动安装，仅使用模式A |
 | WebSearch rate limited | [2/8] | 减少数据源数量，至少保留2个 |
 | img2base64 非图片响应 | [6/8] | 换图片直链，不编造URL |
@@ -734,6 +735,26 @@ python -m toolkit.cli tie-tu preview card_plan.json
 python -m toolkit.cli tie-tu validate card_plan.json
 python -m toolkit.cli tie-tu publish card_plan.json
 ```
+
+The shared protocol commands are also available:
+
+```bash
+python -m toolkit.cli brief article.md --output content_brief.json
+python -m toolkit.cli tie-tu status card_plan.json
+python -m toolkit.cli tie-tu approve card_plan.json --stage card_plan --status approved
+python -m toolkit.cli tie-tu reverse-image card_plan.json --image reference.png
+python -m toolkit.cli tie-tu pilot card_plan.json --image pilot.png
+python -m toolkit.cli tie-tu approve card_plan.json --stage pilot_image --status approved
+python -m toolkit.cli tie-tu batch card_plan.json --output-dir ./output/tie-tu
+```
+
+Tie-Tu image count has a minimum of 1 and no upper limit. The generation gate
+requires an approved card plan, then a reviewed pilot image, before batch
+generation. Every plan carries `ContentBrief`, `SourceLedger`, `ApprovalState`,
+`GenerationState`, and `QualityGate`; reference-image analysis records measured
+ratio, dimensions, palette and limitations without inventing OCR text or source
+facts. Human portraits use the independent `female-portrait-director` prompt
+route when the portrait router detects portrait intent.
 
 The `publish` command uses the Tie-Tu publisher and `add_draft_multi`; it does
 not call the long-form `Publisher.publish` path. Keep research provenance in
