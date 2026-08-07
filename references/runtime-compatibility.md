@@ -13,7 +13,8 @@ workflow.
 | Article writing, SICO structure, anti-AI scoring and repair plan | Yes | Optional `OPENAI_API_KEY` for a second L3 check; host-model scoring is default |
 | Tie-Tu planning, Card Brief, source ledger, reverse-image measurement | Yes | None |
 | Prompt generation and portrait routing | Yes | None |
-| Local image generation from Python/Node | No | One selected provider key, such as `GEMINI_API_KEY`, `DOUBAO_API_KEY` or `OPENAI_API_KEY` |
+| Local image generation through the default host-first path | Yes | The skill writes a host request; the current AI host performs the image call |
+| Direct image generation from Python/Node through a provider API | Optional | Only if an operator explicitly selects a provider and has its key |
 | Image generation by the current host AI | Yes | The host product's own entitlement/session, not a key in this skill |
 | Local HTML/mobile preview and validation | Yes | None |
 | WeChat draft-box publishing | No | `WECHAT_APPID` and `WECHAT_SECRET` or equivalent configured credentials |
@@ -21,13 +22,15 @@ workflow.
 ## Recommended no-key path
 
 1. Ask the host AI to plan, write, review and generate image prompts.
-2. Let WorkBuddy, Claude Code, Codex or another host create the image using its
-   own image capability, or provide an existing image with `tie-tu pilot --image`.
-3. Run local validation and preview.
-4. Use manual copy/paste delivery if WeChat API credentials are not configured.
+2. Run `tie-tu pilot` without `--provider`; the skill writes a structured host
+   request and does not try OpenAI or any other provider.
+3. Let WorkBuddy, Claude Code, Codex or another host create the image using its
+   own image capability, then record it with `tie-tu pilot --image`.
+4. Run local validation and preview. Use manual copy/paste delivery if WeChat
+   API credentials are not configured.
 
 The skill never requires a user to paste a secret into the conversation. Keys,
-when needed for optional local image generation or publishing, are read from
+when an operator explicitly enables an optional external path, are read from
 environment variables or local configuration files.
 
 ## Important boundary

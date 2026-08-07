@@ -253,6 +253,12 @@ def cmd_tie_tu_pilot(args):
     if args.image:
         record_pilot(plan, args.index, args.image, "generated")
     else:
+        if not args.provider:
+            generate_pilot(plan, args.output_dir, None)
+            save_plan(plan, args.plan)
+            request_path = plan.metadata.get("host_requests", {}).get(str(args.index))
+            print(f"宿主模型图片请求已生成，请由当前 AI 工具完成图片后回填: {request_path}")
+            return 0
         path = generate_pilot(plan, args.output_dir, args.provider)
         if not path:
             save_plan(plan, args.plan)
@@ -269,7 +275,7 @@ def cmd_tie_tu_batch(args):
     count = generate_batch(plan, args.output_dir, args.provider)
     save_plan(plan, args.plan)
     print(f"贴图号批量生成完成: {count}/{len(plan.cards)}")
-    return 0 if count == len(plan.cards) else 1
+    return 0 if count == len(plan.cards) or plan.generation_state.batch_status == "awaiting_host" else 1
 
 
 def cmd_tie_tu_reverse_image(args):

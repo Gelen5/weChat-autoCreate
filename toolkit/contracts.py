@@ -79,8 +79,8 @@ class ApprovalState:
 @dataclass
 class GenerationState:
     pilot_card: int = 1
-    pilot_status: str = "pending"  # pending, generated, approved, rejected
-    batch_status: str = "pending"  # pending, running, completed, failed
+    pilot_status: str = "pending"  # pending, awaiting_host, generated, approved, rejected
+    batch_status: str = "pending"  # pending, awaiting_host, running, completed, failed
     cards: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     last_error: str = ""
 

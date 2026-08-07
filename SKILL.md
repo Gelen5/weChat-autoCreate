@@ -741,11 +741,12 @@ WorkBuddy, Claude Code, Codex, ChatGPT and other agents that can read this skill
 and run Python. Topic planning, writing, anti-AI review, Tie-Tu planning,
 portrait prompts, reference-image measurement, local validation and preview do
 not require an API key. `OPENAI_API_KEY` is optional and only enables an
-independent L3 second check. Local code-driven image generation needs a key for
-the selected provider, unless the host AI generates the image and it is passed
-to `tie-tu pilot --image`; WeChat draft-box publishing separately needs WeChat
-credentials. See `references/runtime-compatibility.md` for the capability
-matrix. Never paste secrets into the conversation.
+independent L3 second check. The default `tie-tu pilot` and `tie-tu batch` path
+writes a structured host-image request and never attempts OpenAI or another
+provider. The current host AI generates the image, then it is recorded with
+`tie-tu pilot --image`. Direct provider APIs and WeChat draft-box publishing
+remain optional external paths. See `references/runtime-compatibility.md` for
+the capability matrix. Never paste secrets into the conversation.
 
 The shared protocol commands are also available:
 

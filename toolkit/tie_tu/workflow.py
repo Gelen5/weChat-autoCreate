@@ -39,7 +39,7 @@ def record_pilot(plan: TieTuPlan, index: int, image_path: str, status: str = "ge
 
 
 def record_batch(plan: TieTuPlan, status: str, error: str = "") -> TieTuPlan:
-    if status not in {"pending", "running", "completed", "failed"}:
+    if status not in {"pending", "awaiting_host", "running", "completed", "failed"}:
         raise ValueError(f"不支持的批量生成状态: {status}")
     plan.generation_state.batch_status = status
     plan.generation_state.last_error = error

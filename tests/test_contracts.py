@@ -71,6 +71,16 @@ class SharedContractTests(unittest.TestCase):
             set_approval(plan, "pilot_image", "approved")
             self.assertEqual(generate_batch(plan, temp_dir, generator=FakeGenerator()), 1)
 
+    def test_host_generation_writes_requests_without_provider_key(self):
+        plan = build_plan("城市", "长沙新老城区", image_count=2, portrait_mode="off")
+        set_approval(plan, "card_plan", "approved")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            self.assertIsNone(generate_pilot(plan, temp_dir))
+            request = Path(temp_dir) / "tie-tu-card-01.request.json"
+            self.assertTrue(request.exists())
+            self.assertEqual(plan.generation_state.pilot_status, "awaiting_host")
+            self.assertEqual(plan.metadata["host_requests"]["1"], str(request))
+
 
 if __name__ == "__main__":
     unittest.main()

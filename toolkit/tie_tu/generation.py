@@ -1,8 +1,8 @@
-"""Optional image generation helpers for pilot and batch stages.
+"""Host-first image generation helpers for pilot and batch stages.
 
-The provider remains the existing ImageGenerator; this module only manages
-Tie-Tu prompts and lifecycle state. It is safe to use with a fake generator in
-tests, so planning and state tests do not require an API key.
+Without an explicit provider or generator, this module writes a neutral request
+for the current host AI. It never silently falls back to OpenAI or asks for a
+user API key.
 """
 
 from __future__ import annotations
@@ -27,6 +27,23 @@ def build_card_prompt(plan: TieTuPlan, card: CardPlan) -> str:
     )
 
 
+def _write_host_request(plan: TieTuPlan, card: CardPlan, output_dir: str) -> str:
+    import json
+    target = Path(output_dir)
+    target.mkdir(parents=True, exist_ok=True)
+    request_path = target / f"tie-tu-card-{card.index:02d}.request.json"
+    request_path.write_text(json.dumps({
+        "mode": "host_image_generation",
+        "topic": plan.topic,
+        "card_index": card.index,
+        "ratio": plan.ratio,
+        "prompt": build_card_prompt(plan, card),
+        "instruction": "Use the current host AI image tool and return a local image path; do not add text, logo or watermark.",
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    plan.metadata.setdefault("host_requests", {})[str(card.index)] = str(request_path)
+    return str(request_path)
+
+
 def generate_pilot(plan: TieTuPlan, output_dir: str, provider: Optional[str] = None,
                    generator: Optional[Any] = None) -> Optional[str]:
     if plan.approval_state.stages.get("card_plan") != "approved":
@@ -34,6 +51,11 @@ def generate_pilot(plan: TieTuPlan, output_dir: str, provider: Optional[str] = N
     card = next((item for item in plan.cards if item.index == plan.generation_state.pilot_card), None)
     if card is None:
         raise RuntimeError("没有可试生成的卡片")
+    if generator is None and provider is None:
+        request_path = _write_host_request(plan, card, output_dir)
+        plan.generation_state.mark_card(card.index, "awaiting_host", error=f"host request: {request_path}")
+        plan.generation_state.last_error = ""
+        return None
     service = generator or ImageGenerator()
     try:
         image_path = service.generate(build_card_prompt(plan, card), provider=provider, size="1024x1024", output_dir=output_dir)
@@ -52,10 +74,20 @@ def generate_batch(plan: TieTuPlan, output_dir: str, provider: Optional[str] = N
                    generator: Optional[Any] = None) -> int:
     if plan.approval_state.stages.get("pilot_image") != "approved":
         raise RuntimeError("请先确认试生成图片：tie-tu approve --stage pilot_image --status approved")
-    service = generator or ImageGenerator()
-    record_batch(plan, "running")
     generated = 0
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+    if generator is None and provider is None:
+        record_batch(plan, "awaiting_host")
+        for card in plan.cards:
+            if card.image_path and Path(card.image_path).exists():
+                generated += 1
+                continue
+            request_path = _write_host_request(plan, card, output_dir)
+            plan.generation_state.mark_card(card.index, "awaiting_host", error=f"host request: {request_path}")
+        return generated
+
+    service = generator or ImageGenerator()
+    record_batch(plan, "running")
     for card in plan.cards:
         if card.image_path and Path(card.image_path).exists():
             generated += 1
