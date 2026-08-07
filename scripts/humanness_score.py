@@ -282,46 +282,69 @@ def calculate_pattern_layer(text: str) -> Dict[str, Any]:
     return {"score": round(score, 2), "details": details}
 
 
-def calculate_llm_layer(text: str, api_key: Optional[str] = None) -> Dict[str, Any]:
-    """LLM层评分 (20%) - 使用LLM判断文本是否像AI生成"""
-    if not api_key:
-        return {"score": 50, "details": {"skipped": True, "reason": "No API key"}}
+def calculate_llm_layer(text: str, api_key: Optional[str] = None,
+                        host_score: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """LLM层评分 (20%)。
 
-    try:
-        import requests as req
+    阅卷老师 = 当前运行本 skill 的宿主主模型（即正在跑管道的 AI 本身）：
+      - 在 WorkBuddy 里跑 → 阅卷老师就是 WorkBuddy 当前选中的模型
+      - 在 Codex 里跑   → 阅卷老师就是 GPT
+      - 在 Claude 里跑  → 阅卷老师就是 Claude
+    无需任何 API key，自动适配任意宿主。这是默认模式。
 
-        prompt = f"""请判断以下中文文章是否像AI生成的。评分0-100，100=完全像人类，0=完全像AI。
+    host_score: 宿主主模型在对话中按 L3 标准评判后传入的
+                 {"score": 0-100, "reason": "简短理由"}
+    api_key:    可选 OpenAI key，传入则额外做一次独立二次校验（gpt-4o-mini）。
+    """
+    # ── 模式1（默认）：宿主主模型阅卷 ──
+    if host_score is not None:
+        try:
+            score = float(host_score.get("score", 50))
+            reason = str(host_score.get("reason", ""))
+            return {
+                "score": max(0.0, min(100.0, score)),
+                "details": {"reason": reason, "skipped": False, "grader": "host-model"},
+            }
+        except (ValueError, AttributeError, TypeError):
+            logger.warning("host_score 格式非法，忽略，尝试下一模式")
+
+    # ── 模式2（可选增强）：OpenAI 独立二次校验 ──
+    if api_key:
+        try:
+            import requests as req
+
+            prompt = f"""请判断以下中文文章是否像AI生成的。评分0-100，100=完全像人类，0=完全像AI。
 只返回一个JSON：{{"score": 数字, "reason": "简短理由"}}
 
 文章：
 {text[:2000]}"""
 
-        resp = req.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={"Authorization": f"Bearer {api_key}"},
-            json={
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.3,
-                "max_tokens": 200,
-            },
-            timeout=30,
-        )
-        resp.raise_for_status()
-        content = resp.json()["choices"][0]["message"]["content"]
+            resp = req.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.3,
+                    "max_tokens": 200,
+                },
+                timeout=30,
+            )
+            resp.raise_for_status()
+            content = resp.json()["choices"][0]["message"]["content"]
 
-        # 提取JSON
-        match = re.search(r'\{[^}]+\}', content)
-        if match:
-            result = json.loads(match.group())
-            return {
-                "score": result.get("score", 50),
-                "details": {"reason": result.get("reason", ""), "skipped": False},
-            }
-    except Exception as e:
-        logger.warning(f"LLM评分失败: {e}")
+            # 提取JSON
+            match = re.search(r'\{[^}]+\}', content)
+            if match:
+                result = json.loads(match.group())
+                return {
+                    "score": result.get("score", 50),
+                    "details": {"reason": result.get("reason", ""), "skipped": False, "grader": "openai"},
+                }
+        except Exception as e:
+            logger.warning(f"LLM评分失败: {e}")
 
-    return {"score": 50, "details": {"skipped": True, "reason": "API call failed"}}
+    return {"score": 50, "details": {"skipped": True, "reason": "No host score and no API key"}}
 
 
 def bell_curve_calibration(score: float) -> float:
@@ -338,8 +361,11 @@ def main():
     parser = argparse.ArgumentParser(description="三层反AI质量评分")
     parser.add_argument("file", nargs="?", help="待评分文本文件（默认stdin）")
     parser.add_argument("--text", help="直接传入文本")
-    parser.add_argument("--tier3", action="store_true", help="启用LLM层评分")
-    parser.add_argument("--api-key", help="OpenAI API Key（用于LLM层）")
+    parser.add_argument("--tier3", action="store_true", help="(兼容)启用LLM层，现已默认开启（宿主主模型阅卷）")
+    parser.add_argument("--no-tier3", action="store_true", help="关闭LLM层评分")
+    parser.add_argument("--tier3-json", help="宿主主模型L3评分JSON，如 '{\"score\":90,\"reason\":\"...\"}'")
+    parser.add_argument("--tier3-file", help="从文件读取宿主主模型L3评分JSON")
+    parser.add_argument("--api-key", help="OpenAI API Key（可选，用于L3独立二次校验）")
     parser.add_argument("--json", action="store_true", help="JSON输出")
     parser.add_argument("--no-calibration", action="store_true", help="不做钟形曲线校准")
     args = parser.parse_args()
@@ -361,11 +387,28 @@ def main():
     stat_result = calculate_statistical_layer(text)
     pattern_result = calculate_pattern_layer(text)
 
+    # 宿主主模型阅卷结果（由运行skill的AI在对话中产出，无需任何API key）
+    host_score = None
+    if args.tier3_json:
+        try:
+            host_score = json.loads(args.tier3_json)
+        except json.JSONDecodeError:
+            logger.warning("tier3-json 解析失败，忽略")
+    elif args.tier3_file:
+        try:
+            with open(args.tier3_file, "r", encoding="utf-8") as f:
+                host_score = json.load(f)
+        except Exception as e:
+            logger.warning(f"tier3-file 读取失败: {e}")
+
     api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
-    if args.tier3 and api_key:
-        llm_result = calculate_llm_layer(text, api_key)
+
+    # L3 默认开启：宿主主模型永远在（谁跑skill谁阅卷）；--no-tier3 才关闭
+    tier3_enabled = not args.no_tier3
+    if tier3_enabled:
+        llm_result = calculate_llm_layer(text, api_key=api_key, host_score=host_score)
     else:
-        llm_result = {"score": 50, "details": {"skipped": True, "reason": "Not enabled"}}
+        llm_result = {"score": 50, "details": {"skipped": True, "reason": "Disabled by --no-tier3"}}
 
     # 加权汇总
     raw_score = (
