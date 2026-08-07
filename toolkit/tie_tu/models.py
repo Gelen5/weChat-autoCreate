@@ -44,6 +44,7 @@ class TieTuPlan:
     angle: str = ""
     style: str = ""
     ratio: str = "3:4"
+    image_count: int = 5
     copy: str = ""
     cta: str = ""
     cards: List[CardPlan] = field(default_factory=list)
