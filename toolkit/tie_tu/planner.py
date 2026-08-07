@@ -7,7 +7,6 @@ and validation do not depend on prose parsing.
 
 from __future__ import annotations
 
-import re
 from typing import Dict, List
 
 from .models import CONTENT_TYPES, CardPlan, TieTuPlan
@@ -95,9 +94,12 @@ def build_plan(
     image_count: int = 5,
     style: str = "",
     audience: str = "",
+    portrait_mode: str = "auto",
 ) -> TieTuPlan:
-    if not 3 <= image_count <= 20:
-        raise ValueError("贴图号图片数量必须在 3 到 20 张之间")
+    if not 1 <= image_count <= 20:
+        raise ValueError("贴图号图片数量必须在 1 到 20 张之间")
+    if portrait_mode not in {"auto", "required", "off"}:
+        raise ValueError("portrait_mode 必须是 auto、required 或 off")
 
     selected = content_type or str(recommend_types(industry, topic, title)[0]["type"])
     if selected not in CONTENT_TYPES:
@@ -116,7 +118,7 @@ def build_plan(
             caption="",
         ))
 
-    return TieTuPlan(
+    plan = TieTuPlan(
         industry=industry,
         topic=topic,
         title=title or topic,
@@ -126,5 +128,10 @@ def build_plan(
         angle="待热点研究后补充内容角度",
         style=style,
         cards=cards,
+        portrait_mode=portrait_mode,
         research_notes=["这是结构化策划草案；热点、事实和图片来源由上层 Skill 补充。"],
     )
+    if portrait_mode != "off":
+        from .portrait_router import enhance_plan
+        enhance_plan(plan)
+    return plan

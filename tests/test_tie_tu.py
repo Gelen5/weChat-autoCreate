@@ -2,8 +2,9 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from toolkit.tie_tu.models import load_plan
 
-from toolkit.tie_tu import build_plan, recommend_types, render_preview, validate_plan
+from toolkit.tie_tu import build_plan, recommend_types, render_preview, render_portrait_prompt, validate_plan
 
 
 class TieTuWorkflowTests(unittest.TestCase):
@@ -19,8 +20,12 @@ class TieTuWorkflowTests(unittest.TestCase):
         self.assertEqual([card.index for card in plan.cards], [1, 2, 3, 4, 5])
 
     def test_count_boundaries(self):
-        with self.assertRaises(ValueError):
-            build_plan("AI", "主题", image_count=2)
+        plan = build_plan("生活方式", "复古美女肖像", image_count=1)
+        self.assertTrue(plan.portrait_enabled)
+        self.assertEqual(plan.portrait_route, "retro-hongkong")
+        self.assertIn("watermark", plan.cards[0].portrait_spec["negative_prompt"])
+        self.assertIn("same fictional adult model", plan.model_bible["continuity"])
+        self.assertIn("3:4 vertical", render_portrait_prompt(plan.cards[0].portrait_spec))
         with self.assertRaises(ValueError):
             build_plan("AI", "主题", image_count=21)
 
@@ -34,6 +39,34 @@ class TieTuWorkflowTests(unittest.TestCase):
             html = output.read_text(encoding="utf-8")
             self.assertIn("贴图号独立预览", html)
             self.assertEqual(html.count('class="card"'), 3)
+
+    def test_portrait_can_be_forced_or_disabled(self):
+        forced = build_plan("摄影", "人物故事", image_count=2, portrait_mode="required")
+        self.assertTrue(validate_plan(forced)["ok"])
+        disabled = build_plan("生活方式", "复古美女", image_count=2, portrait_mode="off")
+        self.assertFalse(disabled.portrait_enabled)
+        self.assertEqual(disabled.cards[0].portrait_spec, {})
+
+    def test_loading_legacy_portrait_plan_enhances_it(self):
+        legacy = {
+            "mode": "tie_tu",
+            "industry": "生活方式",
+            "topic": "复古美女旧时光",
+            "title": "复古美女旧时光",
+            "cards": [{
+                "index": 1,
+                "role": "cover",
+                "purpose": "封面",
+                "visual_subject": "复古美女在老街回头",
+                "composition": "3:4 竖幅",
+            }],
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "legacy.json"
+            path.write_text(json.dumps(legacy, ensure_ascii=False), encoding="utf-8")
+            loaded = load_plan(path)
+            self.assertTrue(loaded.portrait_enabled)
+            self.assertEqual(loaded.portrait_route, "retro-hongkong")
 
 
 if __name__ == "__main__":

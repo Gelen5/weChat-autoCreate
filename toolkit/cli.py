@@ -152,6 +152,7 @@ def cmd_tie_tu_plan(args):
         image_count=args.count,
         style=args.style or "",
         audience=args.audience or "",
+        portrait_mode=args.portrait_mode,
     )
     save_plan(plan, args.output)
     print(f"贴图号 card_plan 已生成: {args.output}")
@@ -176,6 +177,27 @@ def cmd_tie_tu_validate(args):
     report = validate_plan(load_plan(args.plan))
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if report["ok"] else 1
+
+
+def cmd_tie_tu_portrait_prompt(args):
+    """Print provider-neutral portrait prompts from an enhanced plan."""
+    from .tie_tu import load_plan, render_portrait_prompt
+
+    plan = load_plan(args.plan)
+    if not plan.portrait_enabled:
+        print("该计划未启用人像增强；可使用 --portrait-mode required 重新生成策划。", file=sys.stderr)
+        return 1
+    cards = plan.cards
+    if args.index:
+        cards = [card for card in cards if card.index == args.index]
+        if not cards:
+            print(f"找不到卡片: {args.index}", file=sys.stderr)
+            return 1
+    for card in cards:
+        print(f"--- card {card.index} / {card.role} ---")
+        print(render_portrait_prompt(card.portrait_spec))
+        print(f"NEGATIVE: {card.portrait_spec['negative_prompt']}")
+    return 0
 
 
 def cmd_tie_tu_publish(args):
@@ -247,9 +269,10 @@ def main():
     tie_tu_plan.add_argument("--content-type", choices=[
         "tutorial", "before_after", "list", "industry_view", "city_change", "emotional_story"
     ])
-    tie_tu_plan.add_argument("--count", type=int, default=5, help="图片数量，3-20")
+    tie_tu_plan.add_argument("--count", type=int, default=5, help="图片数量，1-20")
     tie_tu_plan.add_argument("--style", help="视觉风格")
     tie_tu_plan.add_argument("--audience", help="目标读者")
+    tie_tu_plan.add_argument("--portrait-mode", choices=["auto", "required", "off"], default="auto", help="人像增强：自动、强制或关闭")
     tie_tu_plan.add_argument("--output", default="card_plan.json", help="输出 JSON")
     tie_tu_plan.add_argument("--recommend", action="store_true", help="只输出六类内容类型推荐")
 
@@ -259,6 +282,10 @@ def main():
 
     tie_tu_validate = tie_tu_sub.add_parser("validate", help="检查贴图号卡片策划和图片")
     tie_tu_validate.add_argument("plan", help="card_plan.json")
+
+    tie_tu_prompt = tie_tu_sub.add_parser("portrait-prompt", help="输出人像增强后的生图提示词")
+    tie_tu_prompt.add_argument("plan", help="card_plan.json")
+    tie_tu_prompt.add_argument("--index", type=int, help="只输出指定卡片")
 
     tie_tu_publish = tie_tu_sub.add_parser("publish", help="将贴图号写入公众号草稿箱")
     tie_tu_publish.add_argument("plan", help="card_plan.json")
@@ -292,6 +319,7 @@ def main():
             "plan": cmd_tie_tu_plan,
             "preview": cmd_tie_tu_preview,
             "validate": cmd_tie_tu_validate,
+            "portrait-prompt": cmd_tie_tu_portrait_prompt,
             "publish": cmd_tie_tu_publish,
         }
         handler = tie_tu_handlers.get(args.tie_tu_command)

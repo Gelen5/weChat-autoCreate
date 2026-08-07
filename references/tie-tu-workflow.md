@@ -37,4 +37,19 @@
 | `city_change` | 城市变化型 | 封面 → 旧景 → 今景 → 对比 → 记忆 |
 | `emotional_story` | 情绪故事型 | 封面 → 场景 → 细节 → 转折 → 结尾 |
 
-默认图片数量为 5 张，允许 3–20 张；默认比例为 3:4。
+默认图片数量为 5 张，允许 1–20 张；默认比例为 3:4。
+
+## 人像增强分支
+
+当行业、主题、标题、风格或卡片视觉主体包含人像、美女、模特、写真、穿搭、妆容、复古女性等意图时，`portrait_mode=auto` 会自动启用独立的人像增强层。它不会改变长文流程，也不会替换贴图号的卡片结构。
+
+增强层会为整组卡片生成 `model_bible`，并为每张卡片生成 `portrait_spec`，包含人物身份、年龄边界、路线、姿态、表情、镜头、光线、材质和负面提示词，重点保持多张图片中的同一虚构成年模特一致。
+
+支持：
+
+```bash
+python -m toolkit.cli tie-tu plan --industry "生活方式" --topic "复古美女旧时光" --count 5 --portrait-mode auto --output card_plan.json
+python -m toolkit.cli tie-tu validate card_plan.json
+```
+
+需要关闭时使用 `--portrait-mode off`；需要对没有明显关键词的主题强制使用时使用 `--portrait-mode required`。图片生成器应读取每张卡片的 `portrait_spec`，中文文字继续由贴图号渲染器后期叠加，不交给图片模型生成。

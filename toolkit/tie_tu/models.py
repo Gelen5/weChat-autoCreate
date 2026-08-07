@@ -30,6 +30,7 @@ class CardPlan:
     image_path: str = ""
     image_source: str = "ai"
     source_url: str = ""
+    portrait_spec: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -50,6 +51,10 @@ class TieTuPlan:
     cards: List[CardPlan] = field(default_factory=list)
     sources: List[Dict[str, str]] = field(default_factory=list)
     research_notes: List[str] = field(default_factory=list)
+    portrait_mode: str = "auto"
+    portrait_enabled: bool = False
+    portrait_route: str = ""
+    model_bible: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -72,4 +77,8 @@ def save_plan(plan: TieTuPlan, path: str | Path) -> None:
 
 def load_plan(path: str | Path) -> TieTuPlan:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    return TieTuPlan.from_dict(payload)
+    plan = TieTuPlan.from_dict(payload)
+    if plan.portrait_mode != "off":
+        from .portrait_router import enhance_plan
+        enhance_plan(plan)
+    return plan
