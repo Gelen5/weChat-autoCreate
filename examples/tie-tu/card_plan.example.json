@@ -1,0 +1,32 @@
+{
+  "mode": "tie_tu",
+  "industry": "AI工具",
+  "topic": "普通人如何使用AI提高工作效率",
+  "title": "别再只让AI写文章了",
+  "content_type": "tutorial",
+  "content_type_label": "教程步骤型",
+  "audience": "希望提高工作效率的普通职场人",
+  "angle": "AI真正省时间的地方，是把重复工作拆成可检查的流程",
+  "style": "简约高级苹果风",
+  "ratio": "3:4",
+  "copy": "别再只让AI写完整篇文章。先让它拆标题、开头、论点、案例和结尾，再由人判断什么值得保留。AI负责搭骨架，你负责判断和表达。",
+  "cta": "收藏这套流程，下次写东西先从拆解开始。",
+  "cards": [
+    {
+      "index": 1,
+      "role": "cover",
+      "purpose": "第一眼讲清楚这组贴图在说什么",
+      "visual_subject": "办公桌上的AI工作流和一页待整理的文章草稿",
+      "composition": "3:4竖幅，电脑与纸张位于左侧，右侧留白放标题",
+      "overlay_text": "别再只让AI写文章了",
+      "caption": "AI更适合帮你搭建工作流程",
+      "image_path": "",
+      "image_source": "ai",
+      "source_url": ""
+    }
+  ],
+  "sources": [],
+  "research_notes": [
+    "补充热点研究结果、来源和事实核验记录。"
+  ]
+}

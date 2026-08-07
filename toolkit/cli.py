@@ -137,6 +137,59 @@ def cmd_image_post(args):
     return cmd_gallery(args)
 
 
+def cmd_tie_tu_plan(args):
+    """Create an independent Tie-Tu card-plan scaffold."""
+    from .tie_tu import build_plan, recommend_types, save_plan
+
+    if args.recommend:
+        print(json.dumps(recommend_types(args.industry, args.topic, args.title or ""), ensure_ascii=False, indent=2))
+        return 0
+    plan = build_plan(
+        industry=args.industry,
+        topic=args.topic,
+        title=args.title or "",
+        content_type=args.content_type,
+        image_count=args.count,
+        style=args.style or "",
+        audience=args.audience or "",
+    )
+    save_plan(plan, args.output)
+    print(f"贴图号 card_plan 已生成: {args.output}")
+    return 0
+
+
+def cmd_tie_tu_preview(args):
+    """Render an independent Tie-Tu preview HTML."""
+    from .tie_tu import load_plan, render_preview
+
+    plan = load_plan(args.plan)
+    output = args.output or os.path.splitext(args.plan)[0] + "_preview.html"
+    render_preview(plan, output)
+    print(f"贴图号预览已生成: {output}")
+    return 0
+
+
+def cmd_tie_tu_validate(args):
+    """Validate a Tie-Tu card plan and local image assets."""
+    from .tie_tu import load_plan, validate_plan
+
+    report = validate_plan(load_plan(args.plan))
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    return 0 if report["ok"] else 1
+
+
+def cmd_tie_tu_publish(args):
+    """Publish an independent Tie-Tu plan to the WeChat draft box."""
+    from .tie_tu import TieTuPublisher, load_plan
+
+    media_id = TieTuPublisher().publish_draft(load_plan(args.plan))
+    if media_id:
+        print(f"贴图号草稿已创建: media_id={media_id}")
+        return 0
+    print("贴图号草稿创建失败", file=sys.stderr)
+    return 1
+
+
 def cmd_learn_theme(args):
     """从URL学习排版主题"""
     # 调用learn_theme脚本
@@ -183,6 +236,33 @@ def main():
     image_post_parser.add_argument("--title", required=True, help="标题")
     image_post_parser.add_argument("--content", help="正文内容")
 
+    # tie-tu: independent image-led workflow; article commands remain unchanged
+    tie_tu_parser = subparsers.add_parser("tie-tu", help="独立的微信贴图号流程")
+    tie_tu_sub = tie_tu_parser.add_subparsers(dest="tie_tu_command", required=True)
+
+    tie_tu_plan = tie_tu_sub.add_parser("plan", help="生成贴图号卡片策划骨架")
+    tie_tu_plan.add_argument("--industry", required=True, help="行业")
+    tie_tu_plan.add_argument("--topic", required=True, help="主题")
+    tie_tu_plan.add_argument("--title", help="标题")
+    tie_tu_plan.add_argument("--content-type", choices=[
+        "tutorial", "before_after", "list", "industry_view", "city_change", "emotional_story"
+    ])
+    tie_tu_plan.add_argument("--count", type=int, default=5, help="图片数量，3-20")
+    tie_tu_plan.add_argument("--style", help="视觉风格")
+    tie_tu_plan.add_argument("--audience", help="目标读者")
+    tie_tu_plan.add_argument("--output", default="card_plan.json", help="输出 JSON")
+    tie_tu_plan.add_argument("--recommend", action="store_true", help="只输出六类内容类型推荐")
+
+    tie_tu_preview = tie_tu_sub.add_parser("preview", help="生成贴图号手机预览 HTML")
+    tie_tu_preview.add_argument("plan", help="card_plan.json")
+    tie_tu_preview.add_argument("--output", "-o", help="预览 HTML 路径")
+
+    tie_tu_validate = tie_tu_sub.add_parser("validate", help="检查贴图号卡片策划和图片")
+    tie_tu_validate.add_argument("plan", help="card_plan.json")
+
+    tie_tu_publish = tie_tu_sub.add_parser("publish", help="将贴图号写入公众号草稿箱")
+    tie_tu_publish.add_argument("plan", help="card_plan.json")
+
     # themes
     themes_parser = subparsers.add_parser("themes", help="列出可用主题")
 
@@ -206,6 +286,16 @@ def main():
         "themes": cmd_themes,
         "learn-theme": cmd_learn_theme,
     }
+
+    if args.command == "tie-tu":
+        tie_tu_handlers = {
+            "plan": cmd_tie_tu_plan,
+            "preview": cmd_tie_tu_preview,
+            "validate": cmd_tie_tu_validate,
+            "publish": cmd_tie_tu_publish,
+        }
+        handler = tie_tu_handlers.get(args.tie_tu_command)
+        return handler(args) if handler else 1
 
     handler = command_map.get(args.command)
     if handler:

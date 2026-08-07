@@ -701,3 +701,34 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 | WebSearch rate limited | [2/8] | 减少数据源数量，至少保留2个 |
 | img2base64 非图片响应 | [6/8] | 换图片直链，不编造URL |
 | Chrome headless unavailable | [6/8] | 跳过HTML截图，用SVG替代 |
+## Independent Tie-Tu branch
+
+The existing long-form article pipeline is unchanged. When the user explicitly
+uses `贴图号`, `贴图`, `小绿书`, `图文笔记`, or `图片消息`, route to the
+independent `toolkit/tie_tu/` workflow instead of the long-form `[1/8]-[8/8]`
+article pipeline.
+
+Tie-Tu workflow:
+
+1. Collect industry, topic/title, audience, image count, and visual style.
+2. Research and rank topic candidates before creating images.
+3. Select one of six content types: tutorial, before/after, list,
+   industry view, city change, or emotional story.
+4. Build `card_plan.json` with one visual purpose and one message per card.
+5. Pause for user confirmation of the topic and card design.
+6. Generate or collect 3:4 assets, then render exact text locally.
+7. Run Tie-Tu validation and create a mobile preview HTML.
+8. Only after explicit approval, optionally upload the independent draft.
+
+CLI commands:
+
+```bash
+python -m toolkit.cli tie-tu plan --industry "AI" --topic "AI写作" --output card_plan.json
+python -m toolkit.cli tie-tu preview card_plan.json
+python -m toolkit.cli tie-tu validate card_plan.json
+python -m toolkit.cli tie-tu publish card_plan.json
+```
+
+The `publish` command uses the Tie-Tu publisher and `add_draft_multi`; it does
+not call the long-form `Publisher.publish` path. Keep research provenance in
+the plan's `sources` field and mark AI reconstructions as illustrative.
