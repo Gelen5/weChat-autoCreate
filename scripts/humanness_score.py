@@ -359,7 +359,29 @@ def calculate_llm_layer(text: str, api_key: Optional[str] = None,
         except Exception as e:
             logger.warning(f"LLM评分失败: {e}")
 
-    return {"score": 50, "details": {"skipped": True, "status": "unavailable", "reason": "No host score and no API key", "effective_fallback": 50}}
+    return {"score": 50, "details": {"skipped": True, "status": "unavailable", "reason": "Host score not supplied; external L3 is disabled by default", "effective_fallback": 50}}
+
+
+def load_host_score(value: Optional[str] = None, file_path: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """Load host-model L3 JSON without relying on shell-specific quoting."""
+    raw = value
+    if file_path:
+        with open(file_path, "r", encoding="utf-8-sig") as f:
+            raw = f.read()
+    elif value == "@-":
+        raw = sys.stdin.read()
+    elif value and value.startswith("@"):
+        with open(value[1:], "r", encoding="utf-8-sig") as f:
+            raw = f.read()
+
+    if not raw:
+        return None
+    parsed = json.loads(raw)
+    if not isinstance(parsed, dict):
+        raise ValueError("host score must be a JSON object")
+    if "score" not in parsed:
+        raise ValueError("host score JSON must include score")
+    return parsed
 
 
 def build_repair_plan(stat_result: Dict[str, Any], pattern_result: Dict[str, Any],
@@ -412,6 +434,9 @@ def main():
     parser.add_argument("--api-key", help="OpenAI API Key（可选，用于L3独立二次校验）")
     parser.add_argument("--json", action="store_true", help="JSON输出")
     parser.add_argument("--no-calibration", action="store_true", help="不做钟形曲线校准")
+    parser.add_argument("--tier3-score", type=float, help="Host-model L3 score; avoids JSON quoting on Windows")
+    parser.add_argument("--tier3-reason", default="", help="Host-model L3 scoring reason")
+    parser.add_argument("--external-l3", action="store_true", help="Enable the optional external OpenAI L3 check")
     args = parser.parse_args()
 
     # 读取文本
@@ -433,24 +458,28 @@ def main():
 
     # 宿主主模型阅卷结果（由运行skill的AI在对话中产出，无需任何API key）
     host_score = None
-    if args.tier3_json:
+    host_score_error = None
+    if args.tier3_score is not None:
+        host_score = {"score": args.tier3_score, "reason": args.tier3_reason}
+    elif args.tier3_json or args.tier3_file:
         try:
-            host_score = json.loads(args.tier3_json)
-        except json.JSONDecodeError:
-            logger.warning("tier3-json 解析失败，忽略")
-    elif args.tier3_file:
-        try:
-            with open(args.tier3_file, "r", encoding="utf-8-sig") as f:
-                host_score = json.load(f)
-        except Exception as e:
-            logger.warning(f"tier3-file 读取失败: {e}")
+            host_score = load_host_score(args.tier3_json, args.tier3_file)
+        except (OSError, json.JSONDecodeError, ValueError) as e:
+            host_score = None
+            host_score_error = str(e)
+            logger.error(f"Host L3 score input is invalid: {e}")
 
-    api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
+    # External scoring is opt-in. A stale environment key must not affect the
+    # host-model-first workflow or produce an unexpected network request.
+    external_l3_enabled = args.external_l3 or bool(args.api_key)
+    api_key = args.api_key or (os.environ.get("OPENAI_API_KEY") if external_l3_enabled else None)
 
     # L3 默认开启：宿主主模型永远在（谁跑skill谁阅卷）；--no-tier3 才关闭
     tier3_enabled = not args.no_tier3
     if tier3_enabled:
         llm_result = calculate_llm_layer(text, api_key=api_key, host_score=host_score)
+        if host_score_error and llm_result["details"].get("status") == "unavailable":
+            llm_result["details"]["reason"] = f"Host score input invalid: {host_score_error}; external L3 is disabled by default"
     else:
         llm_result = {"score": 50, "details": {"skipped": True, "status": "disabled", "reason": "Disabled by --no-tier3", "effective_fallback": 50}}
 

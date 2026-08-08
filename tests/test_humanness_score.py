@@ -11,6 +11,14 @@ SPEC.loader.exec_module(MODULE)
 
 
 class HumannessTests(unittest.TestCase):
+    def test_host_score_loader_accepts_inline_json(self):
+        result = MODULE.load_host_score('{"score":82,"reason":"具体场景"}')
+        self.assertEqual(result["score"], 82)
+
+    def test_host_score_loader_rejects_non_object(self):
+        with self.assertRaises(ValueError):
+            MODULE.load_host_score('[82]')
+
     def test_host_l3_is_scored_and_has_status(self):
         result = MODULE.calculate_llm_layer("这是一段有具体细节的文章。", host_score={
             "score": 82,
