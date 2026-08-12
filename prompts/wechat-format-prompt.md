@@ -127,20 +127,25 @@ shadow-lg: "0 8px 24px rgba(0,0,0,0.12)"
 <script>
 function copyArticle() {
   const content = document.getElementById('article-content');
-  const range = document.createRange();
-  range.selectNodeContents(content);
-  const selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-  document.execCommand('copy');
-  selection.removeAllRanges();
+  const html = content.innerHTML;
+  const plain = content.innerText || content.textContent || '';
   const btn = document.querySelector('button[onclick="copyArticle()"]');
-  btn.textContent = '✅ 已复制';
-  btn.style.background = '#07c160';
-  setTimeout(() => {
-    btn.textContent = '📋 复制到微信';
-    btn.style.background = '#1a1a2e';
-  }, 2000);
+  const done = () => {
+    btn.textContent = '✅ 已复制';
+    btn.style.background = '#07c160';
+    setTimeout(() => { btn.textContent = '📋 复制到微信'; btn.style.background = '#1a1a2e'; }, 2000);
+  };
+  const fallback = () => {
+    const range = document.createRange(); range.selectNodeContents(content);
+    const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+    const ok = document.execCommand('copy'); selection.removeAllRanges();
+    if (ok) done(); else alert('复制失败，请手动选中文章正文后复制');
+  };
+  if (!navigator.clipboard || !window.ClipboardItem) return fallback();
+  navigator.clipboard.write([new ClipboardItem({
+    'text/html': new Blob([html], {type: 'text/html;charset=utf-8'}),
+    'text/plain': new Blob([plain], {type: 'text/plain;charset=utf-8'})
+  })]).then(done).catch(fallback);
 }
 </script>
 </body>

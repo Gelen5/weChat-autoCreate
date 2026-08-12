@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from .contracts import ContentBrief, QualityGate, SourceLedger, SourceRecord
+from .text_encoding import read_text
 
 
 def _frontmatter(content: str) -> tuple[Dict[str, Any], str]:
@@ -24,7 +25,7 @@ def _frontmatter(content: str) -> tuple[Dict[str, Any], str]:
 
 def build_article_brief(file_path: str | Path) -> ContentBrief:
     path = Path(file_path)
-    text = path.read_text(encoding="utf-8")
+    text = read_text(path)
     frontmatter, body = _frontmatter(text)
     title = str(frontmatter.get("title", path.stem))
     source_ledger = SourceLedger()

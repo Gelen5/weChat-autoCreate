@@ -14,6 +14,7 @@ from .converter import MarkdownConverter
 from .theme import load_theme, apply_theme
 from .wechat_api import WeChatAPI
 from .briefs import build_article_brief
+from .text_encoding import read_text
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +44,7 @@ class Publisher:
 
         # 读取文件
         ext = os.path.splitext(file_path)[1].lower()
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
+        content = read_text(file_path)
 
         # 解析frontmatter
         frontmatter = {}
@@ -156,8 +156,7 @@ class Publisher:
                 continue
 
             ext = os.path.splitext(file_path)[1].lower()
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
+            content = read_text(file_path)
 
             frontmatter = {}
             if content.startswith("---"):

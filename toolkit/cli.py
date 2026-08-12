@@ -8,6 +8,8 @@ import sys
 import logging
 from typing import Optional
 
+from .text_encoding import read_text
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -22,8 +24,7 @@ def cmd_preview(args):
         print(f"文件不存在: {file_path}", file=sys.stderr)
         return 1
 
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
+    content = read_text(file_path)
 
     # 提取frontmatter
     frontmatter = {}
@@ -52,7 +53,7 @@ def cmd_preview(args):
             f.write(html)
         logger.info(f"已保存: {args.output}")
     else:
-        # 生成完整HTML预览
+        # 生成完整HTML预览。复制按钮写入 text/html，避免公众号只收到纯文本。
         full_html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -64,7 +65,28 @@ body {{ max-width: 680px; margin: 0 auto; padding: 20px; font-family: -apple-sys
 </style>
 </head>
 <body>
-{html}
+<button id="copy-article" type="button" style="display:block;margin:0 auto 16px;padding:10px 18px;border:0;border-radius:8px;background:#07c160;color:#fff;font-size:14px;cursor:pointer;">复制到公众号</button>
+<main id="article-content">{html}</main>
+<script>
+function copyArticle() {{
+  var el = document.getElementById('article-content');
+  var html = el.innerHTML;
+  var plain = el.innerText || el.textContent || '';
+  var done = function() {{ document.getElementById('copy-article').textContent = '已复制 ✓'; }};
+  var fallback = function() {{
+    var range = document.createRange(); range.selectNodeContents(el);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    var ok = document.execCommand('copy'); sel.removeAllRanges();
+    if (ok) done(); else alert('复制失败，请手动选中文章正文后复制');
+  }};
+  if (!navigator.clipboard || !window.ClipboardItem) return fallback();
+  navigator.clipboard.write([new ClipboardItem({{
+    'text/html': new Blob([html], {{type: 'text/html;charset=utf-8'}}),
+    'text/plain': new Blob([plain], {{type: 'text/plain;charset=utf-8'}})
+  }})]).then(done).catch(fallback);
+}}
+document.getElementById('copy-article').addEventListener('click', copyArticle);
+</script>
 </body>
 </html>"""
         output_path = os.path.splitext(file_path)[0] + "_preview.html"
