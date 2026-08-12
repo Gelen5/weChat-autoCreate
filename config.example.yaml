@@ -54,3 +54,7 @@ style_file: "style.yaml"
 
 # 写作参数
 writing_config_file: "writing-config.yaml"
+
+# 可选：本地已发布文章目录，用于发布前同质化与近似重复检查
+recommendation_quality:
+  history_dir: ""

@@ -7,6 +7,7 @@ from typing import Any, Dict
 
 from .models import TieTuPlan
 from .workflow import validate_card_briefs
+from ..recommendation_quality import check_content
 
 
 def _image_size(path: Path):
@@ -53,8 +54,20 @@ def validate_plan(plan: TieTuPlan) -> Dict[str, Any]:
     brief_report = validate_card_briefs(plan)
     errors.extend(brief_report["errors"])
     warnings.extend(brief_report["warnings"])
+    quality_report = check_content(
+        plan.title,
+        "\n".join([plan.copy, plan.cta] + [card.caption for card in plan.cards]),
+        sources=plan.source_ledger,
+        kind="tie_tu",
+        assets=[card.image_path for card in plan.cards if card.image_path],
+        ai_assisted=any(card.image_source == "ai" for card in plan.cards),
+        strict=False,
+    )
+    for item in quality_report["findings"]:
+        message = item["message"] + (f"（{item['repair']}）" if item.get("repair") else "")
+        warnings.append(f"推荐质量[{item['level']}]: {message}")
     plan.quality_gate.findings = [
         {"check": "card_briefs", "passed": brief_report["ok"], "detail": "; ".join(brief_report["errors"] + brief_report["warnings"])}
     ]
     plan.quality_gate.status = "passed" if not errors else "failed"
-    return {"ok": not errors, "errors": errors, "warnings": warnings}
+    return {"ok": not errors, "errors": errors, "warnings": warnings, "recommendation_quality": quality_report}

@@ -15,6 +15,7 @@ from .theme import load_theme, apply_theme
 from .wechat_api import WeChatAPI
 from .briefs import build_article_brief
 from .text_encoding import read_text
+from .recommendation_quality import check_article_file
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,17 @@ class Publisher:
         # Long-form publishing participates in the shared ContentBrief
         # protocol while keeping the existing rendering and API path intact.
         self.last_brief = build_article_brief(file_path)
+        self.last_recommendation_report = check_article_file(
+            file_path,
+            history_dir=self.config.get("recommendation_quality.history_dir"),
+            strict=True,
+        )
+        if self.last_recommendation_report["blocked"]:
+            logger.error("微信推荐质量门禁未通过: %s", self.last_recommendation_report["status"])
+            for item in self.last_recommendation_report["findings"]:
+                if item["level"] in {"block", "revision"}:
+                    logger.error("[%s] %s", item["code"], item["message"])
+            return None
 
         # 读取文件
         ext = os.path.splitext(file_path)[1].lower()

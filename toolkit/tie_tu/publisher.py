@@ -12,6 +12,7 @@ from typing import Optional
 from ..wechat_api import WeChatAPI
 from .models import TieTuPlan
 from .validator import validate_plan
+from ..recommendation_quality import check_content
 
 
 class TieTuPublisher:
@@ -49,6 +50,19 @@ class TieTuPublisher:
         report = validate_plan(plan)
         if not report["ok"]:
             raise ValueError("贴图号质量检查失败: " + "; ".join(report["errors"]))
+        recommendation_report = check_content(
+            plan.title,
+            "\n".join([plan.copy, plan.cta] + [card.caption for card in plan.cards]),
+            sources=plan.source_ledger,
+            kind="tie_tu",
+            assets=[card.image_path for card in plan.cards if card.image_path],
+            ai_assisted=any(card.image_source == "ai" for card in plan.cards),
+            strict=True,
+        )
+        plan.metadata["recommendation_quality"] = recommendation_report
+        if recommendation_report["blocked"]:
+            details = "; ".join(item["message"] for item in recommendation_report["findings"] if item["level"] in {"block", "revision"})
+            raise ValueError("微信推荐质量门禁失败: " + details)
         content, _first_image_url = self.build_content(plan)
         first_image_path = next((card.image_path for card in plan.cards if card.image_path), "")
         thumb_media_id = self.api.upload_cover(first_image_path) if first_image_path else ""

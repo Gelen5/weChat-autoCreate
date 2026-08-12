@@ -773,3 +773,19 @@ route when the portrait router detects portrait intent.
 The `publish` command uses the Tie-Tu publisher and `add_draft_multi`; it does
 not call the long-form `Publisher.publish` path. Keep research provenance in
 the plan's `sources` field and mark AI reconstructions as illustrative.
+
+## 微信推荐质量门禁
+
+公众号长文和独立贴图号在创建草稿前都必须经过推荐质量门禁。它与反 AI
+评分和一般合规检查相互独立，重点检查同质化、搬运改写、信息增量不足、
+低价值 AIGC、标题正文不匹配、事实来源不足和图片质量风险。门禁不承诺
+微信官方推荐，只表示当前检查范围内未发现明显阻断项。
+
+```bash
+python -m toolkit.cli recommendation-check article.md --strict
+python -m toolkit.cli recommendation-check article.md --history-dir ./history
+```
+
+`needs_revision` 和 `blocked` 在严格发布路径会停止草稿创建。没有历史索引时
+必须显示“无法证明与历史内容不重复”，不能把未知当作原创通过。详细规则见
+`references/recommendation-quality.md`。

@@ -322,6 +322,31 @@ def cmd_brief(args):
     return 0
 
 
+def cmd_recommendation_check(args):
+    """运行微信推荐质量门禁，可选生成保守修复稿并复检。"""
+    from .recommendation_quality import check_article_file, repair_content
+
+    report = check_article_file(args.file, history_dir=args.history_dir, strict=args.strict)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as handle:
+            json.dump(report, handle, ensure_ascii=False, indent=2)
+    final_report = report
+    if args.repair_output:
+        from .text_encoding import read_text
+        source = read_text(args.file)
+        title = source.splitlines()[0].lstrip("# ").strip() if source else os.path.splitext(os.path.basename(args.file))[0]
+        repaired = repair_content(title, source, report)
+        repaired_source = repaired["body"]
+        if repaired["title"] != title:
+            repaired_source = repaired_source.replace(title, repaired["title"], 1)
+        with open(args.repair_output, "w", encoding="utf-8") as handle:
+            handle.write(repaired_source)
+        final_report = check_article_file(args.repair_output, history_dir=args.history_dir, strict=args.strict)
+        print(json.dumps({"repair": repaired, "recheck": final_report}, ensure_ascii=False, indent=2))
+    return 1 if final_report["blocked"] else 0
+
+
 def cmd_learn_theme(args):
     """从URL学习排版主题"""
     # 调用learn_theme脚本
@@ -439,6 +464,13 @@ def main():
     brief_parser.add_argument("file", help="Markdown文章文件")
     brief_parser.add_argument("--output", "-o", help="输出JSON路径")
 
+    recommendation_parser = subparsers.add_parser("recommendation-check", help="微信推荐质量门禁检查")
+    recommendation_parser.add_argument("file", help="Markdown/TXT文章文件")
+    recommendation_parser.add_argument("--history-dir", help="本地历史文章目录，用于重复度检查")
+    recommendation_parser.add_argument("--output", "-o", help="输出JSON报告路径")
+    recommendation_parser.add_argument("--strict", action="store_true", help="将需修改项视为阻断")
+    recommendation_parser.add_argument("--repair-output", help="生成保守修复稿并自动复检；不会编造事实或来源")
+
     # themes
     themes_parser = subparsers.add_parser("themes", help="列出可用主题")
 
@@ -462,6 +494,7 @@ def main():
         "themes": cmd_themes,
         "learn-theme": cmd_learn_theme,
         "brief": cmd_brief,
+        "recommendation-check": cmd_recommendation_check,
     }
 
     if args.command == "tie-tu":
