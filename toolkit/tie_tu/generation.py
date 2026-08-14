@@ -11,9 +11,21 @@ from pathlib import Path
 from typing import Any, Optional
 
 from ..image_gen import ImageGenerator
+from ..recommendation_quality import check_generated_asset
 from .models import CardPlan, TieTuPlan
 from .portrait_prompt import render_portrait_prompt
 from .workflow import record_batch, record_pilot
+
+
+def _check_image_or_reject(plan: TieTuPlan, card: CardPlan, image_path: str) -> bool:
+    report = check_generated_asset(image_path)
+    plan.metadata.setdefault("generation_quality", {})[str(card.index)] = report
+    if report["blocked"]:
+        details = "; ".join(item["message"] for item in report["findings"])
+        plan.generation_state.mark_card(card.index, "rejected", image_path, error=details)
+        plan.generation_state.last_error = f"第 {card.index} 张图片未通过生成质量门禁: {details}"
+        return False
+    return True
 
 
 def build_card_prompt(plan: TieTuPlan, card: CardPlan) -> str:
@@ -64,6 +76,8 @@ def generate_pilot(plan: TieTuPlan, output_dir: str, provider: Optional[str] = N
         plan.generation_state.pilot_status = "rejected"
         return None
     if image_path:
+        if not _check_image_or_reject(plan, card, image_path):
+            return None
         record_pilot(plan, card.index, image_path, "generated")
     else:
         plan.generation_state.pilot_status = "rejected"
@@ -90,6 +104,9 @@ def generate_batch(plan: TieTuPlan, output_dir: str, provider: Optional[str] = N
     record_batch(plan, "running")
     for card in plan.cards:
         if card.image_path and Path(card.image_path).exists():
+            if not _check_image_or_reject(plan, card, card.image_path):
+                record_batch(plan, "failed", plan.generation_state.last_error)
+                return generated
             generated += 1
             continue
         try:
@@ -98,6 +115,9 @@ def generate_batch(plan: TieTuPlan, output_dir: str, provider: Optional[str] = N
             plan.generation_state.mark_card(card.index, "failed", error=str(exc))
             continue
         if image_path:
+            if not _check_image_or_reject(plan, card, image_path):
+                record_batch(plan, "failed", plan.generation_state.last_error)
+                return generated
             record_pilot(plan, card.index, image_path, "generated")
             generated += 1
         else:

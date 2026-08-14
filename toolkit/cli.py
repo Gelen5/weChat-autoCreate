@@ -17,11 +17,18 @@ logger = logging.getLogger(__name__)
 def cmd_preview(args):
     """预览文章渲染效果"""
     from .converter import MarkdownConverter
+    from .recommendation_quality import check_article_file
     from .theme import load_theme, apply_theme
 
     file_path = args.file
     if not os.path.exists(file_path):
         print(f"文件不存在: {file_path}", file=sys.stderr)
+        return 1
+
+    quality_report = check_article_file(file_path, strict=True)
+    if quality_report["blocked"]:
+        print(json.dumps(quality_report, ensure_ascii=False, indent=2), file=sys.stderr)
+        logger.error("文章生成后的推荐质量门禁未通过，已停止排版")
         return 1
 
     content = read_text(file_path)
@@ -270,9 +277,19 @@ def cmd_tie_tu_source(args):
 
 
 def cmd_tie_tu_pilot(args):
+    from .recommendation_quality import check_generated_asset
     from .tie_tu import generate_pilot, load_plan, record_pilot, save_plan
     plan = load_plan(args.plan)
     if args.image:
+        quality_report = check_generated_asset(args.image)
+        plan.metadata.setdefault("generation_quality", {})[str(args.index)] = quality_report
+        if quality_report["blocked"]:
+            plan.generation_state.mark_card(args.index, "rejected", args.image,
+                                            error="; ".join(item["message"] for item in quality_report["findings"]))
+            plan.generation_state.last_error = "试生成图片未通过生成质量门禁"
+            save_plan(plan, args.plan)
+            print(json.dumps(quality_report, ensure_ascii=False, indent=2), file=sys.stderr)
+            return 1
         record_pilot(plan, args.index, args.image, "generated")
     else:
         if not args.provider:

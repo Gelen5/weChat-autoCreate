@@ -57,8 +57,9 @@ class SharedContractTests(unittest.TestCase):
 
             class FakeGenerator:
                 def generate(self, prompt, provider=None, size=None, output_dir=None):
+                    from PIL import Image
                     result = Path(output_dir) / "generated.png"
-                    result.write_bytes(b"image")
+                    Image.effect_noise((1024, 1024), 50).convert("RGB").save(result)
                     return str(result)
 
             with self.assertRaises(RuntimeError):
@@ -66,6 +67,7 @@ class SharedContractTests(unittest.TestCase):
             set_approval(plan, "card_plan", "approved")
             generated = generate_pilot(plan, temp_dir, generator=FakeGenerator())
             self.assertTrue(generated)
+            self.assertEqual(plan.metadata["generation_quality"]["1"]["status"], "pass")
             with self.assertRaises(RuntimeError):
                 generate_batch(plan, temp_dir, generator=FakeGenerator())
             set_approval(plan, "pilot_image", "approved")

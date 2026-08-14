@@ -7,7 +7,7 @@ from .publisher import Publisher
 from .wechat_api import WeChatAPI
 from .image_gen import ImageGenerator
 from .contracts import ApprovalState, ContentBrief, GenerationState, QualityGate, SourceLedger, SourceRecord
-from .recommendation_quality import check_article_file, check_assets, check_content, repair_content
+from .recommendation_quality import check_article_file, check_assets, check_content, check_generated_asset, repair_content
 
 __all__ = [
     "Config",
@@ -28,5 +28,6 @@ __all__ = [
     "check_article_file",
     "check_assets",
     "check_content",
+    "check_generated_asset",
     "repair_content",
 ]

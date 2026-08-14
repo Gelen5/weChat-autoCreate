@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from toolkit.contracts import SourceLedger, SourceRecord
-from toolkit.recommendation_quality import check_content, repair_content
+from toolkit.recommendation_quality import check_content, check_generated_asset, repair_content
 
 
 class RecommendationQualityTests(unittest.TestCase):
@@ -43,6 +43,10 @@ class RecommendationQualityTests(unittest.TestCase):
         report = check_content("city change", "", kind="tie_tu", strict=True)
         self.assertTrue(report["blocked"])
         self.assertIn("insufficient_tie_tu_copy", [item["code"] for item in report["findings"]])
+
+    def test_generated_asset_gate_blocks_missing_asset(self):
+        report = check_generated_asset("missing-generated-image.png")
+        self.assertTrue(report["blocked"])
 
 
 if __name__ == "__main__":

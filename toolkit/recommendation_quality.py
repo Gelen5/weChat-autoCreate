@@ -205,6 +205,19 @@ def check_assets(paths: Sequence[str | Path]) -> dict[str, Any]:
     return {"score": round(sum(scores) / len(scores)) if scores else None, "findings": findings}
 
 
+def check_generated_asset(path: str | Path) -> dict[str, Any]:
+    """Run the strict asset gate immediately after a generated image exists."""
+    asset_report = check_assets([path])
+    report = {
+        "kind": "tie_tu_asset_generation",
+        "scores": {"asset_quality": asset_report["score"]},
+        "findings": asset_report["findings"],
+        "history": {"configured": False, "compared": 0, "coverage": "not_applicable"},
+        "disclaimer": "图片生成质量门禁只检查当前图片文件，不等同于微信官方推荐或审核结果。",
+    }
+    return _finish(report, strict=True)
+
+
 def repair_content(title: str, body: str, report: Mapping[str, Any]) -> dict[str, Any]:
     repaired_title, repaired_body = str(title or ""), str(body or "")
     changes: list[dict[str, str]] = []

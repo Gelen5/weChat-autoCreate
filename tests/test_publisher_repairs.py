@@ -17,7 +17,8 @@ class PublisherRepairTests(unittest.TestCase):
     def test_preview_contains_html_clipboard_and_plain_text_fallback(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             source = Path(temp_dir) / "article.md"
-            source.write_text("---\ntitle: 测试\n---\n正文", encoding="utf-8")
+            body = "测试文章记录了2026年的一次具体观察。" + "读者可以根据这条信息重新检查自己的判断，并结合时间、地点和过程做出更稳妥的选择。" * 4
+            source.write_text(f"---\ntitle: 测试\n---\n{body}", encoding="utf-8")
             args = type("Args", (), {"file": str(source), "theme": None, "output": None})()
             self.assertEqual(cmd_preview(args), 0)
             preview = source.with_name("article_preview.html").read_text(encoding="utf-8")
