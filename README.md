@@ -161,8 +161,7 @@
 不会。所有样式都是微信能识别的格式，复制过去就是看到的那个样子。
 
 **Q：要不要钱？**
-需要来找我来获取使用权：Gelen5
-未经过我授权去使用以及售卖的，后果自负
+需要来加我V获取使用权：Gelen5
 
 **Q：可以把以前的文章给它学吗？**
 可以。把文章链接或文字发给它，说"学一下这个风格"就行。
@@ -183,6 +182,6 @@
 
 ---
 
-**[MIT License](./LICENSE)** · 开源 · 永远免费
+**[MIT License](./LICENSE)** · 未经授权去售卖的，后果自负
 
 本工具融合了三个优秀开源项目的精华：[wewrite](https://github.com/oaker-io/wewrite) · [md2wechat](https://github.com/yingjieweb/md2wechat) · [wechat-publisher](https://github.com/spacingly/wechat-publisher)，感谢所有贡献者。
