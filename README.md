@@ -182,6 +182,6 @@
 
 ---
 
-**[MIT License](./LICENSE)** · 未经授权去售卖的，后果自负
+**[MIT License](./LICENSE)** · 未经授权使用及售卖的，后果自负
 
-本工具融合了三个优秀开源项目的精华：[wewrite](https://github.com/oaker-io/wewrite) · [md2wechat](https://github.com/yingjieweb/md2wechat) · [wechat-publisher](https://github.com/spacingly/wechat-publisher)，感谢所有贡献者。
+本工具将持续更新迭代！！！
