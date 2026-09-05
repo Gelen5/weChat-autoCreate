@@ -351,6 +351,7 @@ avg_sentence_length: 22  # 目标平均句长
 **目标**：将Markdown正文转化为微信公众号合规HTML，并通过移动端排版质量门禁。
 
 **排版前必读**：
+- `references/leaf-and-compliance.md` — **leaf 包裹铁律** + 微信编辑器隐形坑 + 合规校验器用法（写HTML前必读）
 - `references/mobile-layout-quality.md` — 首屏信息单元、装饰预算、移动端断行、证据型配图表、反馈路由、发布前检查。
 - `references/wechat-html-spec.md` — 微信HTML/CSS兼容规则。
 
@@ -382,9 +383,17 @@ AI根据组件库为每篇文章**现场设计**排版——不是套模板，�
    - 结尾 → 文末总结块 + 互动引导
 9. 全程内联样式，不用class/id
 10. 一篇挑3-5种组件循环使用，但避免为了展示组件而堆组件
+10a. **所有含中文的文本节点必须套 `<span leaf="">`**；装饰性空元素塞 `<span leaf=""><br></span>`。
+     不包会被微信编辑器重建DOM时丢样式——这是"预览好看、发出去崩"的头号原因。
+     详见 `references/leaf-and-compliance.md`
 11. CSS随机扰动（可选）：字号±1px、间距±2px、行高±0.05；若质检发现错乱，关闭扰动
 12. 暗黑模式（可选）：生成暗色版本，prefers-color-scheme适配
 13. 运行 `python scripts/layout_quality_check.py <文章.html>`，按 findings 修复后再交付
+14. **运行 `python scripts/wechat_compliance_check.py <文章.html>`（强制，不可跳过）**
+    - 这是确定性门禁，查平台合规；上面第13步的启发式检查查阅读质量，**两个都要跑**
+    - `error` 和 `warn_blocking` 必须修到 0 才能交付
+    - `warn_allowable`（`css_gap`/`css_float`/`halfwidth_punct` 等）可用 `--allow CODE` 放行，会留痕
+    - 阻塞项**不可放行**，包括：leaf 未包裹、图片非微信域名、grid/position/var/@media 等被过滤特性
 ```
 
 **组件库**（12基础组件）：
@@ -485,6 +494,10 @@ cd {skill_dir}/scripts && npx tsx render.ts <文章.md>
 | layout_quality_check 报 decoration_overload | 删除无功能横线/竖线/边框，改用标题层级和留白 |
 | layout_quality_check 报 image_caption_gap | 补图注或证据说明；无证据价值的图片直接删掉 |
 | layout_quality_check 报 heading_short_tail_risk | 改写标题或按完整语义分行，不用空格硬凑 |
+| compliance_check 报 leaf_missing_all / leaf_missing_partial | 把所有含中文的文本节点套上 `<span leaf="">` |
+| compliance_check 报 image_host_not_wechat | 图片先传微信素材接口拿 mmbiz 链接，或内嵌 base64 |
+| compliance_check 报 css_grid / css_position / css_var | 改用 flex；CSS 变量写死成色值 |
+| compliance_check 报 css_gap | 争议项。可 `--allow css_gap` 放行，或改用子元素 margin |
 
 ---
 
@@ -595,6 +608,7 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 | `{skill_dir}/.env` | 环境变量（WECHAT_APP_ID, WECHAT_APP_SECRET, OPENAI_API_KEY） |
 
 **读取即指令**：
+- `references/leaf-and-compliance.md` — **leaf 包裹铁律 + 微信编辑器隐形坑 + 合规校验器（写HTML前必读）**
 - `references/components.md` — 组件库+设计token+SVG模板（写HTML前必读）
 - `references/article-template.html` — 带手机预览框的文章骨架（复制它开工）
 - `references/ai_artifacts_blacklist.md` — AI禁用词+替换建议表（[4/8]写作+[5/8]反AI必读）
@@ -602,6 +616,10 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 - `references/wechat-html-spec.md` — 微信HTML/CSS支持与过滤规范
 - `references/styles/*.md` — 风格预设文件
 - `prompts/wechat-format-prompt.md` — 排版提示词模板
+
+**排版双检查**（[7/8] 第13、14步，两个都要跑）：
+- `scripts/layout_quality_check.py` — 启发式，判移动端阅读质量
+- `scripts/wechat_compliance_check.py` — 确定性，判平台合规（阻塞项不可放行）
 
 **Python解释器约定**：
 - 优先使用 `python3`，不可用则用 `python`

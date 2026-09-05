@@ -1,0 +1,82 @@
+{
+  "file": "references/components.md",
+  "blocks": 15,
+  "blocking": 0,
+  "per_block": [
+    {
+      "block": 1,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 2,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 3,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 4,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 5,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 6,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 7,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 8,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 9,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 10,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 11,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 12,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 13,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 14,
+      "blocking": [],
+      "warn": []
+    },
+    {
+      "block": 15,
+      "blocking": [],
+      "warn": []
+    }
+  ]
+}

@@ -85,9 +85,9 @@
 
 ```html
 <section style="background:#1D1D1F;border-radius:12px;padding:32px 24px;margin:0 0 24px 0;">
-  <p style="margin:0 0 8px 0;font-size:11px;color:#C9A962;letter-spacing:3px;font-weight:bold;">CATEGORY</p>
-  <h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.4;color:#FFFFFF;font-weight:bold;">文章标题写在这里</h1>
-  <p style="margin:0;font-size:13px;color:#A1A1A6;">作者名 · 2026年6月6日</p>
+  <p style="margin:0 0 8px 0;font-size:11px;color:#C9A962;letter-spacing:3px;font-weight:bold;"><span leaf="">CATEGORY</span></p>
+  <h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.4;color:#FFFFFF;font-weight:bold;"><span leaf="">文章标题写在这里</span></h1>
+  <p style="margin:0;font-size:13px;color:#A1A1A6;"><span leaf="">作者名 · 2026年6月6日</span></p>
 </section>
 ```
 
@@ -96,9 +96,9 @@
 带编号和装饰线的小节标题。
 
 ```html
-<section style="margin:32px 0 16px 0;display:flex;align-items:center;gap:12px;">
-  <section style="flex-shrink:0;width:32px;height:32px;background:#1D1D1F;border-radius:8px;text-align:center;line-height:32px;color:#C9A962;font-size:14px;font-weight:bold;">1</section>
-  <h2 style="margin:0;font-size:18px;line-height:1.4;color:#1D1D1F;font-weight:bold;">小节标题</h2>
+<section style="margin:32px 0 16px 0;display:flex;align-items:center;">
+  <section style="flex-shrink:0;width:32px;height:32px;background:#1D1D1F;border-radius:8px;text-align:center;line-height:32px;color:#C9A962;font-size:14px;font-weight:bold;"><span leaf="">1</span></section>
+  <h2 style="margin:0 0 0 12px;font-size:18px;line-height:1.4;color:#1D1D1F;font-weight:bold;"><span leaf="">小节标题</span></h2>
 </section>
 ```
 
@@ -106,8 +106,8 @@
 
 标准正文段落，含首行缩进和段间距。
 
-```html>
-<p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#6E6E73;text-align:justify;">这里是正文内容，每段之间用16px间距分隔。支持<strong style="color:#1D1D1F;">加粗强调</strong>和<span style="color:#C9A962;font-weight:bold;">金色强调</span>。</p>
+```html
+<p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#6E6E73;text-align:justify;"><span leaf="">这里是正文内容，每段之间用16px间距分隔。支持</span><strong style="color:#1D1D1F;"><span leaf="">加粗强调</span></strong><span leaf="">和</span><span style="color:#C9A962;font-weight:bold;"><span leaf="">金色强调</span></span><span leaf="">。</span></p>
 ```
 
 ### 组件5：分隔线 (Divider)
@@ -116,11 +116,14 @@
 
 ```html
 <section style="margin:24px 0;text-align:center;">
+  <span leaf=""><br></span>
   <section style="display:inline-block;width:40px;height:1px;background:#E5E5E5;vertical-align:middle;"></section>
-  <span style="display:inline-block;margin:0 14px;color:#D0D0D0;font-size:8px;">●</span>
+  <span style="display:inline-block;margin:0 14px;color:#D0D0D0;font-size:8px;"><span leaf="">●</span></span>
   <section style="display:inline-block;width:40px;height:1px;background:#E5E5E5;vertical-align:middle;"></section>
 </section>
 ```
+
+> 装饰性空元素必须带 `<span leaf=""><br></span>` 占位，否则微信会把它当空标签清掉。
 
 ### 组件6：Callout 浅灰信号框 (Light Callout)
 
@@ -128,8 +131,8 @@
 
 ```html
 <section style="background:#F7F7F5;border-radius:8px;padding:16px;margin:16px 0;">
-  <p style="margin:0 0 4px 0;font-size:13px;color:#6E6E73;font-weight:bold;">💡 提示</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;">这里是补充说明的内容，适合放数据引用、背景知识或注意事项。</p>
+  <p style="margin:0 0 4px 0;font-size:13px;color:#6E6E73;font-weight:bold;"><span leaf="">💡 提示</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">这里是补充说明的内容，适合放数据引用、背景知识或注意事项。</span></p>
 </section>
 ```
 
@@ -139,8 +142,8 @@
 
 ```html
 <section style="background:#1D1D1F;border-radius:8px;padding:20px;margin:16px 0;">
-  <p style="margin:0 0 4px 0;font-size:13px;color:#C9A962;font-weight:bold;">⚡ 核心观点</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#A1A1A6;">这里是必须被读者记住的核心信息，深色背景制造视觉停顿。</p>
+  <p style="margin:0 0 4px 0;font-size:13px;color:#C9A962;font-weight:bold;"><span leaf="">⚡ 核心观点</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#A1A1A6;"><span leaf="">这里是必须被读者记住的核心信息，深色背景制造视觉停顿。</span></p>
 </section>
 ```
 
@@ -150,8 +153,8 @@
 
 ```html
 <section style="margin:24px 0;padding:16px 20px;border-left:3px solid #C9A962;background:#FBF8F1;border-radius:0 8px 8px 0;">
-  <p style="margin:0;font-size:15px;line-height:1.7;color:#1D1D1F;font-weight:bold;">"这里是一句值得被记住的金句，读者会截图分享的那种。"</p>
-  <p style="margin:8px 0 0 0;font-size:13px;color:#A1A1A6;">—— 出处</p>
+  <p style="margin:0;font-size:15px;line-height:1.7;color:#1D1D1F;font-weight:bold;"><span leaf="">"这里是一句值得被记住的金句，读者会截图分享的那种。"</span></p>
+  <p style="margin:8px 0 0 0;font-size:13px;color:#A1A1A6;"><span leaf="">—— 出处</span></p>
 </section>
 ```
 
@@ -162,10 +165,10 @@
 ```html
 <section style="margin:16px 0;">
   <section style="display:flex;align-items:flex-start;">
-    <section style="flex-shrink:0;width:28px;height:28px;background:#1D1D1F;border-radius:50%;text-align:center;line-height:28px;color:#C9A962;font-size:14px;font-weight:bold;">1</section>
+    <section style="flex-shrink:0;width:28px;height:28px;background:#1D1D1F;border-radius:50%;text-align:center;line-height:28px;color:#C9A962;font-size:14px;font-weight:bold;"><span leaf="">1</span></section>
     <section style="margin-left:12px;flex:1;">
-      <p style="margin:0 0 4px 0;font-size:15px;font-weight:bold;color:#1D1D1F;">步骤标题</p>
-      <p style="margin:0;font-size:14px;line-height:1.6;color:#6E6E73;">步骤的详细描述，说明这一步要做什么。</p>
+      <p style="margin:0 0 4px 0;font-size:15px;font-weight:bold;color:#1D1D1F;"><span leaf="">步骤标题</span></p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#6E6E73;"><span leaf="">步骤的详细描述，说明这一步要做什么。</span></p>
     </section>
   </section>
 </section>
@@ -177,10 +180,12 @@
 
 ```html
 <section style="margin:20px 0;text-align:center;">
-  <img src="IMAGE_URL" style="width:100%;border-radius:8px;display:block;" />
-  <p style="margin:8px 0 0 0;font-size:12px;color:#A1A1A6;text-align:center;">图片说明文字 / 来源标注</p>
+  <img src="IMAGE_URL" style="max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto;" />
+  <p style="margin:8px 0 0 0;font-size:12px;color:#A1A1A6;text-align:center;"><span leaf="">图片说明文字 / 来源标注</span></p>
 </section>
 ```
+
+> 图片用 `max-width:100%` 而非 `width:100%`，否则小图会被拉伸变糊。
 
 ### 组件11：文末总结块 (Summary Block)
 
@@ -188,10 +193,10 @@
 
 ```html
 <section style="margin:32px 0 0 0;padding:20px;background:#F7F7F5;border-radius:8px;border:1px solid #E5E5E5;">
-  <p style="margin:0 0 12px 0;font-size:15px;font-weight:bold;color:#1D1D1F;">核心要点</p>
-  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#6E6E73;">1. 要点一</p>
-  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#6E6E73;">2. 要点二</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;">3. 要点三</p>
+  <p style="margin:0 0 12px 0;font-size:15px;font-weight:bold;color:#1D1D1F;"><span leaf="">核心要点</span></p>
+  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">1. 要点一</span></p>
+  <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">2. 要点二</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">3. 要点三</span></p>
 </section>
 ```
 
@@ -200,10 +205,10 @@
 文末标签或分类标签。
 
 ```html
-<section style="margin:16px 0;display:flex;flex-wrap:wrap;gap:8px;">
-  <span style="display:inline-block;padding:4px 12px;background:#FBF8F1;color:#C9A962;font-size:12px;border-radius:20px;">标签一</span>
-  <span style="display:inline-block;padding:4px 12px;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;">标签二</span>
-  <span style="display:inline-block;padding:4px 12px;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;">标签三</span>
+<section style="margin:16px 0;display:flex;flex-wrap:wrap;">
+  <span style="display:inline-block;padding:4px 12px;margin:0 8px 8px 0;background:#FBF8F1;color:#C9A962;font-size:12px;border-radius:20px;"><span leaf="">标签一</span></span>
+  <span style="display:inline-block;padding:4px 12px;margin:0 8px 8px 0;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;"><span leaf="">标签二</span></span>
+  <span style="display:inline-block;padding:4px 12px;margin:0 8px 8px 0;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;"><span leaf="">标签三</span></span>
 </section>
 ```
 
