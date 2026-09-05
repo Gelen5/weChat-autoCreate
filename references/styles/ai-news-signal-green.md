@@ -61,17 +61,17 @@
 
 ```html
 <section style="background:#0A0A0A;border-radius:12px;padding:28px 24px;margin:0 0 20px 0;">
-  <section style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-    <section style="width:8px;height:8px;border-radius:50%;background:#EF4444;"></section>
-    <span style="font-size:12px;color:#EF4444;font-weight:bold;letter-spacing:1px;">BREAKING</span>
-    <span style="font-size:12px;color:#8A8A8A;">· 2小时前</span>
+  <section style="display:flex;align-items:center;margin-bottom:12px;">
+    <section style="width:8px;height:8px;border-radius:50%;background:#EF4444;margin-right:8px;"></section>
+    <span style="font-size:12px;color:#EF4444;font-weight:bold;letter-spacing:1px;margin-right:8px;">BREAKING</span>
+    <span style="font-size:12px;color:#8A8A8A;"><span leaf="">· 2小时前</span></span>
   </section>
-  <h1 style="margin:0 0 12px 0;font-size:20px;line-height:1.4;color:#FFFFFF;font-weight:bold;">OpenAI 发布 GPT-5：多模态推理能力飞跃</h1>
-  <p style="margin:0 0 16px 0;font-size:14px;line-height:1.6;color:#8A8A8A;">旗舰模型在数学推理和代码生成上超越人类专家水平</p>
-  <section style="display:flex;gap:8px;flex-wrap:wrap;">
-    <span style="display:inline-block;padding:4px 10px;background:#052E16;color:#34D399;font-size:11px;border-radius:4px;font-weight:bold;">↑ 利好 AI基础设施</span>
-    <span style="display:inline-block;padding:4px 10px;background:#052E16;color:#34D399;font-size:11px;border-radius:4px;font-weight:bold;">↑ 利好 AI应用层</span>
-    <span style="display:inline-block;padding:4px 10px;background:#450A0A;color:#FCA5A5;font-size:11px;border-radius:4px;font-weight:bold;">↓ 利空 传统SaaS</span>
+  <h1 style="margin:0 0 12px 0;font-size:20px;line-height:1.4;color:#FFFFFF;font-weight:bold;"><span leaf="">OpenAI 发布 GPT-5：多模态推理能力飞跃</span></h1>
+  <p style="margin:0 0 16px 0;font-size:14px;line-height:1.6;color:#8A8A8A;"><span leaf="">旗舰模型在数学推理和代码生成上超越人类专家水平</span></p>
+  <section style="display:flex;flex-wrap:wrap;">
+    <span style="display:inline-block;padding:4px 10px;margin:0 8px 4px 0;background:#052E16;color:#34D399;font-size:11px;border-radius:4px;font-weight:bold;"><span leaf="">↑ 利好 AI基础设施</span></span>
+    <span style="display:inline-block;padding:4px 10px;background:#052E16;color:#34D399;font-size:11px;border-radius:4px;font-weight:bold;"><span leaf="">↑ 利好 AI应用层</span></span>
+    <span style="display:inline-block;padding:4px 10px;margin:0 8px 4px 0;background:#450A0A;color:#FCA5A5;font-size:11px;border-radius:4px;font-weight:bold;"><span leaf="">↓ 利空 传统SaaS</span></span>
   </section>
 </section>
 ```
@@ -82,13 +82,13 @@
 
 ```html
 <section style="margin:16px 0;border:2px solid #059669;border-radius:8px;overflow:hidden;">
-  <section style="background:#059669;padding:6px 12px;display:flex;align-items:center;gap:6px;">
-    <section style="width:6px;height:6px;border-radius:50%;background:#FFFFFF;"></section>
-    <span style="font-size:11px;color:#FFFFFF;font-weight:bold;">真实截图 · 非AI生成</span>
+  <section style="background:#059669;padding:6px 12px;display:flex;align-items:center;">
+    <section style="width:6px;height:6px;border-radius:50%;background:#FFFFFF;margin-right:6px;"></section>
+    <span style="font-size:11px;color:#FFFFFF;font-weight:bold;"><span leaf="">真实截图 · 非AI生成</span></span>
   </section>
   <img src="IMAGE_URL" style="width:100%;display:block;" />
   <section style="padding:8px 12px;background:#F5F5F5;">
-    <p style="margin:0;font-size:12px;color:#3A3A3A;">来源：OpenAI 官方博客 · 2026.06.06</p>
+    <p style="margin:0;font-size:12px;color:#3A3A3A;"><span leaf="">来源：OpenAI 官方博客 · 2026.06.06</span></p>
   </section>
 </section>
 ```
@@ -100,7 +100,7 @@
 ```html
 <section style="margin:20px 0;padding:16px 20px;border-left:4px solid #059669;background:#F5F5F5;">
   <p style="margin:0 0 4px 0;font-size:12px;color:#059669;font-weight:bold;letter-spacing:1px;">OUR TAKE</p>
-  <p style="margin:0;font-size:15px;line-height:1.6;color:#0A0A0A;font-weight:bold;">GPT-5 将在6个月内重塑企业AI应用格局，基础设施厂商先受益。</p>
+  <p style="margin:0;font-size:15px;line-height:1.6;color:#0A0A0A;font-weight:bold;"><span leaf="">GPT-5 将在6个月内重塑企业AI应用格局，基础设施厂商先受益。</span></p>
 </section>
 ```
 
@@ -109,24 +109,24 @@
 三信号卡，红/绿/黄三个维度判断。
 
 ```html
-<section style="margin:20px 0;display:flex;gap:8px;">
-  <!-- 绿色信号 -->
+<section style="margin:20px 0;display:flex;">
+  
   <section style="flex:1;background:#052E16;border-radius:8px;padding:14px;text-align:center;">
-    <p style="margin:0 0 4px 0;font-size:22px;color:#34D399;font-weight:bold;">看多</p>
-    <p style="margin:0;font-size:12px;color:#34D399;">AI基础设施</p>
-    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;">GPU需求持续增长</p>
+    <p style="margin:0 0 4px 0;font-size:22px;color:#34D399;font-weight:bold;"><span leaf="">看多</span></p>
+    <p style="margin:0;font-size:12px;color:#34D399;"><span leaf="">AI基础设施</span></p>
+    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;"><span leaf="">GPU需求持续增长</span></p>
   </section>
-  <!-- 黄色信号 -->
-  <section style="flex:1;background:#422006;border-radius:8px;padding:14px;text-align:center;">
-    <p style="margin:0 0 4px 0;font-size:22px;color:#FDE68A;font-weight:bold;">观望</p>
-    <p style="margin:0;font-size:12px;color:#FDE68A;">AI Agent赛道</p>
-    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;">商业模式待验证</p>
+  
+  <section style="flex:1;margin-left:8px;background:#422006;border-radius:8px;padding:14px;text-align:center;">
+    <p style="margin:0 0 4px 0;font-size:22px;color:#FDE68A;font-weight:bold;"><span leaf="">观望</span></p>
+    <p style="margin:0;font-size:12px;color:#FDE68A;"><span leaf="">AI Agent赛道</span></p>
+    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;"><span leaf="">商业模式待验证</span></p>
   </section>
-  <!-- 红色信号 -->
-  <section style="flex:1;background:#450A0A;border-radius:8px;padding:14px;text-align:center;">
-    <p style="margin:0 0 4px 0;font-size:22px;color:#FCA5A5;font-weight:bold;">看空</p>
-    <p style="margin:0;font-size:12px;color:#FCA5A5;">传统SaaS</p>
-    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;">被AI原生替代</p>
+  
+  <section style="flex:1;margin-left:8px;background:#450A0A;border-radius:8px;padding:14px;text-align:center;">
+    <p style="margin:0 0 4px 0;font-size:22px;color:#FCA5A5;font-weight:bold;"><span leaf="">看空</span></p>
+    <p style="margin:0;font-size:12px;color:#FCA5A5;"><span leaf="">传统SaaS</span></p>
+    <p style="margin:4px 0 0 0;font-size:11px;color:#8A8A8A;"><span leaf="">被AI原生替代</span></p>
   </section>
 </section>
 ```
@@ -137,11 +137,11 @@
 
 ```html
 <section style="margin:16px 0;padding:12px 16px;background:#FEF3C7;border-radius:6px;border-left:3px solid #F59E0B;">
-  <section style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-    <span style="font-size:12px;color:#92400E;font-weight:bold;">⚠️ 证据等级：B</span>
-    <span style="font-size:11px;color:#78350F;">行业传闻 + 多方交叉验证</span>
+  <section style="display:flex;align-items:center;margin-bottom:6px;">
+    <span style="font-size:12px;color:#92400E;font-weight:bold;margin-right:8px;"><span leaf="">⚠️ 证据等级：B</span></span>
+    <span style="font-size:11px;color:#78350F;"><span leaf="">行业传闻 + 多方交叉验证</span></span>
   </section>
-  <p style="margin:0;font-size:13px;line-height:1.6;color:#78350F;">此消息来自三个独立信源，但官方尚未确认。发布时间可能调整。</p>
+  <p style="margin:0;font-size:13px;line-height:1.6;color:#78350F;"><span leaf="">此消息来自三个独立信源，但官方尚未确认。发布时间可能调整。</span></p>
 </section>
 ```
 
@@ -158,11 +158,11 @@
 3. **确定性多高** — 证据等级
 
 ```html
-<!-- 第一屏结构 -->
+<span leaf="">
 [Dark News Hero] → 包含标题+信号标签+时间
 [Conclusion Callout] → 一句话判断
 [Three Signal Cards] → 看多/观望/看空
-```
+</span>```
 
 ### 4.2 信息分层
 
@@ -243,3 +243,18 @@
 3. 金额统一用一种货币标注
 4. 大数字用K/M/B简写（如5.2M, 1.3B）
 5. 对比数据必须放在同一行/同一卡
+
+---
+
+## 附：文章类型 × 组件配方表
+
+> **先判断文章类型，再按配方选组件**——本风格的主战场是快讯和新闻拆解。信号标签（↑利好/↓利空/→观望）只在真实有方向判断时用，全文≤4个。同屏组件种类 ≤ 4。
+
+| 文章类型 | 开场 | 正文骨架 | 证据组件 | 收尾 | 禁用 |
+|---|---|---|---|---|---|
+| 新闻快讯（主场景） | Dark News Hero | 正文段落×2 → Real Image Frame → 正文段落×2 | Evidence Warning（仅传闻消息） | Conclusion Callout → 信号标签 | Three Signal Cards |
+| 深度分析 | Dark News Hero | （正文段落）×N，每2-3屏插1个Real Image Frame | Evidence Warning | Three Signal Cards → Conclusion Callout | — |
+| 测评对比 | Dark News Hero | （正文段落 + Real Image Frame）×N | Evidence Warning（实测数据标注来源） | Three Signal Cards → Conclusion Callout | — |
+| 观点锐评 | Dark News Hero | 正文段落×2 → Evidence Warning（引信源）→ 正文段落×2 | — | Conclusion Callout | Real Image Frame、Three Signal Cards |
+| 清单盘点 | Dark News Hero | （正文段落 + 信号标签）×N | — | Three Signal Cards | Evidence Warning |
+| 教程 | 不推荐本风格（信息密度让位于步骤感） | — | — | — | 改用 ink-gold |

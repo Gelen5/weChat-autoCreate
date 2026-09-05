@@ -246,5 +246,83 @@ class ComponentLibraryBaselineTests(unittest.TestCase):
         self.assertEqual(offenders, [], f"gap found in component blocks: {offenders}")
 
 
+class SourceLintTests(unittest.TestCase):
+    """Source lint: every ```html snippet in references/ must be compliant."""
+
+    def test_all_reference_snippets_are_clean(self):
+        from source_lint import lint_markdown
+
+        offenders = []
+        for md in sorted((REPO_ROOT / "references").rglob("*.md")):
+            for index, blocking in lint_markdown(md):
+                offenders.append((md.name, index, blocking))
+        self.assertEqual(offenders, [], f"blocking snippets in references/: {offenders}")
+
+    def test_counter_example_blocks_are_skipped(self):
+        import tempfile
+
+        from source_lint import lint_markdown
+
+        with tempfile.TemporaryDirectory() as tmp:
+            marked = Path(tmp) / "marked.md"
+            marked.write_text(
+                "```html\n<!-- \u274c \u9519\u8bef\u793a\u4f8b -->\n"
+                '<p style="font-size:15px;">\u6ca1\u6709leaf\u5305\u88f9\u7684\u4e2d\u6587</p>\n```\n',
+                encoding="utf-8",
+            )
+            self.assertEqual(lint_markdown(marked), [])
+
+            plain = Path(tmp) / "plain.md"
+            plain.write_text(
+                "```html\n"
+                '<p style="font-size:15px;">\u6ca1\u6709leaf\u5305\u88f9\u7684\u4e2d\u6587</p>\n```\n',
+                encoding="utf-8",
+            )
+            self.assertEqual(len(lint_markdown(plain)), 1)
+
+
+class LeafAutofixTests(unittest.TestCase):
+    """leaf_autofix must wrap bare CJK nodes, be idempotent, skip teaching blocks."""
+
+    SAMPLE = (
+        "```html\n"
+        '<p style="font-size:15px;">\u88f8\u4e2d\u6587\u6b63\u6587</p>\n'
+        "```\n"
+        "```html\n"
+        "<!-- \u274c \u53cd\u4f8b\uff1a\u4e0d\u5305\u88f9 -->\n"
+        "<p>\u53cd\u4f8b\u4e2d\u6587</p>\n"
+        "```\n"
+    )
+
+    def _write(self, path: Path) -> None:
+        path.write_text(self.SAMPLE, encoding="utf-8")
+
+    def test_wraps_and_is_idempotent_and_skips_counter_examples(self):
+        import tempfile
+
+        from leaf_autofix import process_file
+
+        with tempfile.TemporaryDirectory() as tmp:
+            md = Path(tmp) / "sample.md"
+            self._write(md)
+
+            self.assertTrue(process_file(md, False))   # first pass: fixed
+            fixed = md.read_text(encoding="utf-8")
+            self.assertIn('<span leaf="">\u88f8\u4e2d\u6587\u6b63\u6587</span>', fixed)
+            self.assertIn("<p>\u53cd\u4f8b\u4e2d\u6587</p>", fixed)  # \u274c block untouched
+
+            self.assertFalse(process_file(md, False))  # second pass: idempotent
+
+            self.assertFalse(process_file(md, True))   # check-only reports clean
+
+            # fixed output must satisfy the compliance checker
+            import re
+
+            block = re.findall(r"```html\n(.*?)```", fixed, re.S)[0]
+            blocking = [f.code for f in analyze(block)
+                        if f.severity in ("error", "warn_blocking")]
+            self.assertEqual(blocking, [])
+
+
 if __name__ == "__main__":
     unittest.main()

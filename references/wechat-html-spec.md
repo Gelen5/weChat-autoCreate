@@ -162,7 +162,7 @@
 | `flex-shrink` | flex收缩 | `flex-shrink:0` |
 | `justify-content` | 主轴对齐 | `justify-content:center` |
 | `align-items` | 交叉轴对齐 | `align-items:center` |
-| `gap` | 间距 | `gap:8px` |
+| `gap` | ⚠️ 争议属性：部分编辑器环境会过滤。**默认避免**，用子元素 `margin` 替代（如 `margin:0 8px 4px 0`）。实测确认支持前不写入正式交付件 |
 | `overflow` | 溢出处理 | `overflow:hidden` |
 | `vertical-align` | 垂直对齐 | `vertical-align:middle` |
 

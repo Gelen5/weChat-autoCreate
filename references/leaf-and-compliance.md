@@ -38,7 +38,7 @@
 **嵌套时包一层就够**：祖先链上任意一级有 `leaf` 属性即算通过，不必每层都包。
 
 ```html
-<!-- ✅ 正确：外层包了，内层不必重复 -->
+
 <section style="background:#F7F7F5;">
   <p style="margin:0;"><span leaf="">重点内容</span></p>
 </section>
@@ -49,7 +49,7 @@
 只有装饰作用、不含文字的元素（分隔线、色块、留白），微信会当成空标签清掉。必须塞一个空的 leaf 占位：
 
 ```html
-<!-- ✅ 装饰横线 -->
+
 <section style="margin:24px 0;text-align:center;">
   <span leaf=""><br></span>
   <section style="display:inline-block;width:40px;height:1px;background:#E5E5E5;"></section>
@@ -87,7 +87,7 @@
 删除线用 `text-decoration:line-through`，高亮用背景色。
 
 ```html
-<span style="text-decoration:line-through;">原价 199</span>
+<span style="text-decoration:line-through;"><span leaf="">原价 199</span></span>
 ```
 
 ### 2.3 代码块不用 `white-space:pre`

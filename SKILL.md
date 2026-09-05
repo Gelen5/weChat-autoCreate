@@ -355,6 +355,8 @@ avg_sentence_length: 22  # 目标平均句长
 - `references/mobile-layout-quality.md` — 首屏信息单元、装饰预算、移动端断行、证据型配图表、反馈路由、发布前检查。
 - `references/wechat-html-spec.md` — 微信HTML/CSS兼容规则。
 
+**顺序读取纪律**：上述文档必须**按列出顺序逐一读完，不可并行、不可跳读**。读完在心里复述关键数字（leaf 包裹规则、字号范围 12-22px、行高 1.6-1.8、装饰锚点 ≤5、同屏组件 ≤4）再动手。复述不出来就重读——这是防止"扫一眼就开写"导致合规规则被漏掉的自检机制。
+
 **三种排版模式**：
 
 #### A. 组件化手写HTML（精排，默认）
@@ -366,7 +368,7 @@ AI根据组件库为每篇文章**现场设计**排版——不是套模板，�
 1. 读取 references/mobile-layout-quality.md（移动端排版质量门禁）
 2. 读取 references/components.md（12基础组件库）
 3. 读取 references/article-template.html（骨架模板）
-4. 如用户指定风格或内容匹配，读取 references/styles/ 下对应预设
+4. 如用户指定风格或内容匹配，读取 references/styles/ 下对应预设，**并按该预设文末的「文章类型 × 组件配方表」确定组件序列**——先判断文章类型（快讯/深度/测评/清单/锐评/教程/故事），再按配方选组件，禁止逐段随机挑组件
 5. 复制 article-template.html 到输出目录
 6. 先写排版决策卡：
    - 首屏信息单元：刊头/日期、主标题、识别资产、副标题、编者按、短开场、完整重点句
@@ -620,6 +622,10 @@ Humanness评分：综合 XX（L1=XX L2=XX L3=XX）
 **排版双检查**（[7/8] 第13、14步，两个都要跑）：
 - `scripts/layout_quality_check.py` — 启发式，判移动端阅读质量
 - `scripts/wechat_compliance_check.py` — 确定性，判平台合规（阻塞项不可放行）
+
+**源头质量工具**（改 references/ 下任何含 ```html 块的文档后必跑）：
+- `scripts/source_lint.py` — 扫描全部参考文档里的 HTML 片段，阻塞项即失败（含 `<!-- ❌` 的教学反例块自动豁免）
+- `scripts/leaf_autofix.py <文件.md>...` — 自动为片段补 `<span leaf="">` 包裹（幂等，`--check` 只报告不改写）；**改完必须跑 source_lint 复核**
 
 **Python解释器约定**：
 - 优先使用 `python3`，不可用则用 `python`

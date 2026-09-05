@@ -58,11 +58,11 @@
 ```html
 <section style="background:#1D1D1F;border-radius:12px;padding:32px 24px;margin:0 0 20px 0;">
   <p style="margin:0 0 6px 0;font-size:11px;color:#C9A962;letter-spacing:3px;font-weight:bold;">CATEGORY</p>
-  <h1 style="margin:0 0 14px 0;font-size:21px;line-height:1.4;color:#FFFFFF;font-weight:bold;">文章标题写在这里</h1>
-  <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#A1A1A6;">副标题或一句话价值承诺</p>
-  <section style="display:flex;gap:8px;flex-wrap:wrap;">
-    <span style="display:inline-block;padding:4px 12px;background:#C9A962;color:#1D1D1F;font-size:11px;border-radius:4px;font-weight:bold;">5 min</span>
-    <span style="display:inline-block;padding:4px 12px;background:transparent;color:#A1A1A6;font-size:11px;border-radius:4px;border:1px solid #3A3A3C;">标签</span>
+  <h1 style="margin:0 0 14px 0;font-size:21px;line-height:1.4;color:#FFFFFF;font-weight:bold;"><span leaf="">文章标题写在这里</span></h1>
+  <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#A1A1A6;"><span leaf="">副标题或一句话价值承诺</span></p>
+  <section style="display:flex;flex-wrap:wrap;">
+    <span style="display:inline-block;padding:4px 12px;margin:0 8px 4px 0;background:#C9A962;color:#1D1D1F;font-size:11px;border-radius:4px;font-weight:bold;">5 min</span>
+    <span style="display:inline-block;padding:4px 12px;margin:0 8px 4px 0;background:transparent;color:#A1A1A6;font-size:11px;border-radius:4px;border:1px solid #3A3A3C;"><span leaf="">标签</span></span>
   </section>
 </section>
 ```
@@ -70,18 +70,18 @@
 ### 3.2 导航卡（边框勾勒，激活态强调）
 
 ```html
-<section style="margin:0 0 24px 0;display:flex;gap:8px;">
+<section style="margin:0 0 24px 0;display:flex;">
   <section style="flex:1;border-radius:8px;padding:12px;text-align:center;border:1px solid #1D1D1F;">
     <p style="margin:0 0 2px 0;font-size:18px;color:#1D1D1F;font-weight:bold;">01</p>
-    <p style="margin:0;font-size:12px;color:#6E6E73;">第一部分</p>
+    <p style="margin:0;font-size:12px;color:#6E6E73;"><span leaf="">第一部分</span></p>
   </section>
-  <section style="flex:1;border-radius:8px;padding:12px;text-align:center;border:1px solid #E5E5E5;">
+  <section style="flex:1;margin-left:8px;border-radius:8px;padding:12px;text-align:center;border:1px solid #E5E5E5;">
     <p style="margin:0 0 2px 0;font-size:18px;color:#6E6E73;font-weight:bold;">02</p>
-    <p style="margin:0;font-size:12px;color:#A1A1A6;">第二部分</p>
+    <p style="margin:0;font-size:12px;color:#A1A1A6;"><span leaf="">第二部分</span></p>
   </section>
-  <section style="flex:1;border-radius:8px;padding:12px;text-align:center;border:1px solid #E5E5E5;">
+  <section style="flex:1;margin-left:8px;border-radius:8px;padding:12px;text-align:center;border:1px solid #E5E5E5;">
     <p style="margin:0 0 2px 0;font-size:18px;color:#6E6E73;font-weight:bold;">03</p>
-    <p style="margin:0;font-size:12px;color:#A1A1A6;">第三部分</p>
+    <p style="margin:0;font-size:12px;color:#A1A1A6;"><span leaf="">第三部分</span></p>
   </section>
 </section>
 ```
@@ -89,25 +89,25 @@
 ### 3.3 Section Header（暗色圆块+金色编号）
 
 ```html
-<section style="margin:28px 0 16px 0;display:flex;align-items:center;gap:12px;">
-  <section style="flex-shrink:0;width:32px;height:32px;background:#1D1D1F;border-radius:8px;text-align:center;line-height:32px;color:#C9A962;font-size:14px;font-weight:bold;">1</section>
-  <h2 style="margin:0;font-size:18px;line-height:1.4;color:#1D1D1F;font-weight:bold;">小节标题</h2>
+<section style="margin:28px 0 16px 0;display:flex;align-items:center;">
+  <section style="flex-shrink:0;width:32px;height:32px;background:#1D1D1F;border-radius:8px;text-align:center;line-height:32px;color:#C9A962;font-size:14px;font-weight:bold;margin-right:12px;">1</section>
+  <h2 style="margin:0;font-size:18px;line-height:1.4;color:#1D1D1F;font-weight:bold;"><span leaf="">小节标题</span></h2>
 </section>
 ```
 
 ### 3.4 正文段落
 
 ```html
-<p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#6E6E73;">正文内容，关键词用 <strong style="color:#1D1D1F;">加粗强调</strong>，极少数可以用 <span style="color:#C9A962;font-weight:bold;">金色强调</span> 但每篇文章不超过3处。</p>
+<p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#6E6E73;"><span leaf="">正文内容，关键词用 </span><strong style="color:#1D1D1F;"><span leaf="">加粗强调</span></strong><span leaf="">，极少数可以用 </span><span style="color:#C9A962;font-weight:bold;"><span leaf="">金色强调</span></span><span leaf=""> 但每篇文章不超过3处。</span></p>
 ```
 
 ### 3.5 终端卡（深色+金色提示符）
 
 ```html
 <section style="background:#1D1D1F;border-radius:8px;padding:16px;margin:16px 0;overflow-x:auto;">
-  <section style="display:flex;gap:6px;margin-bottom:12px;">
-    <section style="width:10px;height:10px;border-radius:50%;background:#6E6E73;"></section>
-    <section style="width:10px;height:10px;border-radius:50%;background:#A1A1A6;"></section>
+  <section style="display:flex;margin-bottom:12px;">
+    <section style="width:10px;height:10px;border-radius:50%;background:#6E6E73;margin-right:6px;"></section>
+    <section style="width:10px;height:10px;border-radius:50%;background:#A1A1A6;margin-right:6px;"></section>
     <section style="width:10px;height:10px;border-radius:50%;background:#C9A962;"></section>
   </section>
   <p style="margin:0;font-size:13px;line-height:1.7;color:#A1A1A6;font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;white-space:pre-wrap;word-break:break-all;"><span style="color:#C9A962;">$</span> command --flag <span style="color:#C9A962;">"argument"</span></p>
@@ -117,22 +117,22 @@
 ### 3.6 Callout（暖米底+金色左边框，统一风格）
 
 ```html
-<!-- 强调型（default） -->
+
 <section style="background:#FBF8F1;border-radius:8px;padding:16px 18px;margin:16px 0;border-left:3px solid #C9A962;">
-  <p style="margin:0 0 4px 0;font-size:13px;color:#1D1D1F;font-weight:bold;">⚡ 关键信息</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;">补充说明内容。</p>
+  <p style="margin:0 0 4px 0;font-size:13px;color:#1D1D1F;font-weight:bold;"><span leaf="">⚡ 关键信息</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">补充说明内容。</span></p>
 </section>
 
-<!-- 信息型（中性） -->
+
 <section style="background:#F7F7F5;border-radius:8px;padding:16px 18px;margin:16px 0;">
-  <p style="margin:0 0 4px 0;font-size:13px;color:#6E6E73;font-weight:bold;">💡 参考信息</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;">中性背景信息。</p>
+  <p style="margin:0 0 4px 0;font-size:13px;color:#6E6E73;font-weight:bold;"><span leaf="">💡 参考信息</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">中性背景信息。</span></p>
 </section>
 
-<!-- 深色强调框 -->
+
 <section style="background:#1D1D1F;border-radius:8px;padding:16px 18px;margin:16px 0;">
-  <p style="margin:0 0 4px 0;font-size:13px;color:#C9A962;font-weight:bold;">⚠️ 注意事项</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#A1A1A6;">重要的警示信息。</p>
+  <p style="margin:0 0 4px 0;font-size:13px;color:#C9A962;font-weight:bold;"><span leaf="">⚠️ 注意事项</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#A1A1A6;"><span leaf="">重要的警示信息。</span></p>
 </section>
 ```
 
@@ -140,8 +140,8 @@
 
 ```html
 <section style="margin:20px 0;padding:16px 20px;border-left:3px solid #C9A962;background:#FBF8F1;border-radius:0 8px 8px 0;">
-  <p style="margin:0;font-size:15px;line-height:1.7;color:#1D1D1F;font-weight:bold;">值得被截图分享的核心金句。</p>
-  <p style="margin:8px 0 0 0;font-size:13px;color:#A1A1A6;">—— 出处</p>
+  <p style="margin:0;font-size:15px;line-height:1.7;color:#1D1D1F;font-weight:bold;"><span leaf="">值得被截图分享的核心金句。</span></p>
+  <p style="margin:8px 0 0 0;font-size:13px;color:#A1A1A6;"><span leaf="">—— 出处</span></p>
 </section>
 ```
 
@@ -178,20 +178,20 @@
 
 ```html
 <section style="margin:28px 0 0 0;padding:20px;background:#F7F7F5;border-radius:8px;border:1px solid #E5E5E5;">
-  <p style="margin:0 0 12px 0;font-size:15px;font-weight:bold;color:#1D1D1F;">本篇要点</p>
-  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.7;color:#6E6E73;">✓ 要点一</p>
-  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.7;color:#6E6E73;">✓ 要点二</p>
-  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;">✓ 要点三</p>
+  <p style="margin:0 0 12px 0;font-size:15px;font-weight:bold;color:#1D1D1F;"><span leaf="">本篇要点</span></p>
+  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">✓ 要点一</span></p>
+  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">✓ 要点二</span></p>
+  <p style="margin:0;font-size:14px;line-height:1.7;color:#6E6E73;"><span leaf="">✓ 要点三</span></p>
 </section>
 ```
 
 ### 3.11 标签Chips
 
 ```html
-<section style="margin:16px 0;display:flex;flex-wrap:wrap;gap:8px;">
-  <span style="display:inline-block;padding:4px 12px;background:#FBF8F1;color:#C9A962;font-size:12px;border-radius:20px;">主标签</span>
-  <span style="display:inline-block;padding:4px 12px;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;">次标签</span>
-  <span style="display:inline-block;padding:4px 12px;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;">次标签</span>
+<section style="margin:16px 0;display:flex;flex-wrap:wrap;">
+  <span style="display:inline-block;padding:4px 12px;margin:0 8px 4px 0;background:#FBF8F1;color:#C9A962;font-size:12px;border-radius:20px;"><span leaf="">主标签</span></span>
+  <span style="display:inline-block;padding:4px 12px;margin:0 8px 4px 0;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;"><span leaf="">次标签</span></span>
+  <span style="display:inline-block;padding:4px 12px;margin:0 8px 4px 0;background:#F7F7F5;color:#6E6E73;font-size:12px;border-radius:20px;"><span leaf="">次标签</span></span>
 </section>
 ```
 
@@ -237,3 +237,18 @@
 - ❌ 过多深色块 → 压抑，深色块每篇最多3个
 - ❌ 金色滥用 → 只在5%的位置出现，超过10%就土了
 - ✓ 核心心法：**像排版一本书一样排版你的文章——文字本身就是内容，颜色只做最克制的提示**
+
+---
+
+## 附：文章类型 × 组件配方表
+
+> **先判断文章类型，再按配方选组件**——配方保证同类文章的排版气质稳定。禁止拿到组件库就逐段随机挑组件。同屏组件种类 ≤ 4，同一组件连续出现 ≤ 3 次。
+
+| 文章类型 | 开场 | 正文骨架 | 强调/数据 | 收尾 | 禁用 |
+|---|---|---|---|---|---|
+| 深度技术分析 | Hero卡 | 导航卡 →（Section Header → 正文段落）×N | Callout（每节≤1）+ SVG指标卡（全篇≤2） | 金句框 → 文末总结块 | 标签Chips滥用 |
+| 教程 / 避坑指南 | Hero卡 | （Section Header → 正文段落 → 终端卡）×N | Callout（避坑提示） | 文末总结块 | 金句框、导航卡 |
+| 观点锐评 | Hero卡 | 正文段落×2 → 金句框 → 正文段落×2 | Callout（核心论点） | 文末总结块 | 导航卡、终端卡、SVG指标卡 |
+| 新闻快讯 | Hero卡 | 正文段落×3 | Callout（背景补充） | 标签Chips | 导航卡、终端卡、金句框 |
+| 清单盘点 | Hero卡 | （Section Header → 正文段落 + SVG指标卡）×N | — | 文末总结块 | 终端卡、金句框 |
+| 测评对比 | Hero卡 | 导航卡 →（Section Header → 正文段落 → SVG指标卡）×N | Callout（结论） | 文末总结块 | 金句框、终端卡 |

@@ -118,10 +118,10 @@ image_processing:
 ### 3.2 代码块样式方案
 
 ```html
-<!-- 行内代码 -->
+
 <span style="background-color: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 14px; color: #e74c3c;">code_here</span>
 
-<!-- 代码块 -->
+
 <section style="background-color: #2d2d2d; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto;">
   <pre style="margin: 0; font-family: 'Menlo', 'Consolas', monospace; font-size: 14px; line-height: 1.6; color: #f8f8f2; white-space: pre-wrap; word-wrap: break-word;"><code>code content here</code></pre>
 </section>
@@ -155,19 +155,19 @@ code_block_rules:
 ### 4.2 表格样式方案
 
 ```html
-<!-- 模拟表格 -->
+
 <section style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; margin: 16px 0;">
-  <!-- 表头 -->
+  
   <section style="display: flex; background-color: #f5f5f5; padding: 10px 12px; font-weight: bold; border-bottom: 2px solid #e0e0e0;">
-    <span style="flex: 1;">列1</span>
-    <span style="flex: 1;">列2</span>
-    <span style="flex: 1;">列3</span>
+    <span style="flex: 1;"><span leaf="">列1</span></span>
+    <span style="flex: 1;"><span leaf="">列2</span></span>
+    <span style="flex: 1;"><span leaf="">列3</span></span>
   </section>
-  <!-- 数据行 -->
+  
   <section style="display: flex; padding: 10px 12px; border-bottom: 1px solid #e0e0e0;">
-    <span style="flex: 1;">数据1</span>
-    <span style="flex: 1;">数据2</span>
-    <span style="flex: 1;">数据3</span>
+    <span style="flex: 1;"><span leaf="">数据1</span></span>
+    <span style="flex: 1;"><span leaf="">数据2</span></span>
+    <span style="flex: 1;"><span leaf="">数据3</span></span>
   </section>
 </section>
 ```
