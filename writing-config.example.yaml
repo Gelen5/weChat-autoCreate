@@ -1,67 +1,17 @@
-# 写作参数模板 - 18个核心参数
-# 控制AI写作的行为和输出质量
+# 2.0 写作策略只保留内容目标，不用统计指标制造“真人感”。
+target_length: 1500
+primary_goal: "trust"       # trust / explain / search / convert / opinion / record
+evidence_level: "standard" # light / standard / high
+seo_mode: "intent_only"
+author_profile: ""
 
-# ── 基础参数 ──
+revision:
+  mode: "local_only"
+  preserve_facts: true
+  preserve_citations: true
+  invent_experience: false
 
-# 目标字数（文章长度）
-target_word_count: 1500
-
-# 段落数量范围
-paragraph_count_min: 5
-paragraph_count_max: 12
-
-# 平均句长（字）
-avg_sentence_length: 18
-
-# 句长标准差（越大越像人类）
-sentence_length_stddev: 8
-
-# ── 段落参数 ──
-
-# 单句段落比例（短段落占比）
-single_sentence_paragraph_rate: 0.2
-
-# 段落最大字数
-paragraph_max_length: 200
-
-# 段落间过渡句概率
-transition_probability: 0.3
-
-# ── 语气参数 ──
-
-# 不确定性表达频率（0-1，越高越像人类）
-uncertainty_rate: 0.2
-
-# 词汇丰富度目标（type-token ratio，0-1）
-vocabulary_richness: 0.45
-
-# 副词使用密度（每百字）
-adverb_density: 4
-
-# 负面情绪比例（0-1）
-negative_emotion_ratio: 0.1
-
-# ── 结构参数 ──
-
-# 修辞手法使用概率
-rhetoric_probability: 0.3
-
-# 设问句频率
-question_frequency: 0.08
-
-# 引用/数据支撑频率
-citation_frequency: 0.15
-
-# ── 反AI参数 ──
-
-# 禁用词严格度（0-1，越高越严格）
-forbidden_word_strictness: 0.8
-
-# 自我纠正插入概率
-self_correction_rate: 0.05
-
-# 词汇温度（口语化程度，0-1）
-word_warmth: 0.4
-
-# 碎句概率（<5字短句）
-broken_sentence_rate: 0.1
+quality:
+  block_unsupported_key_claims: true
+  block_fabricated_experience: true
+  require_reader_simulation: true

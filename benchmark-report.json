@@ -1,0 +1,184 @@
+{
+  "tasks": [
+    {
+      "id": "ai-product-update",
+      "type": "科技",
+      "old": {
+        "chars": 115,
+        "paragraphs": 2,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 3,
+        "opening_specificity": 0
+      },
+      "new": {
+        "chars": 151,
+        "paragraphs": 3,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 0,
+        "opening_specificity": 1
+      },
+      "notes": []
+    },
+    {
+      "id": "creator-first-failure",
+      "type": "个人经历",
+      "old": {
+        "chars": 100,
+        "paragraphs": 2,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 1,
+        "opening_specificity": 0
+      },
+      "new": {
+        "chars": 174,
+        "paragraphs": 3,
+        "concrete_markers": 1,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 0,
+        "opening_specificity": 6
+      },
+      "notes": []
+    },
+    {
+      "id": "middle-age-friendship",
+      "type": "情感",
+      "old": {
+        "chars": 104,
+        "paragraphs": 2,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 3,
+        "opening_specificity": 2
+      },
+      "new": {
+        "chars": 174,
+        "paragraphs": 3,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 0,
+        "opening_specificity": 6
+      },
+      "notes": []
+    },
+    {
+      "id": "phone-review",
+      "type": "产品评测",
+      "old": {
+        "chars": 103,
+        "paragraphs": 2,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 2,
+        "opening_specificity": 0
+      },
+      "new": {
+        "chars": 163,
+        "paragraphs": 3,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 0,
+        "opening_specificity": 3
+      },
+      "notes": []
+    },
+    {
+      "id": "wechat-layout-tutorial",
+      "type": "教程",
+      "old": {
+        "chars": 101,
+        "paragraphs": 2,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 3,
+        "opening_specificity": 0
+      },
+      "new": {
+        "chars": 171,
+        "paragraphs": 3,
+        "concrete_markers": 0,
+        "source_markers": 0,
+        "repeated_sentences": 0,
+        "ai_pattern_hits": 0,
+        "opening_specificity": 3
+      },
+      "notes": []
+    },
+    {
+      "id": "platform-rule-comment",
+      "type": "热点评论",
+      "old": null,
+      "new": null,
+      "notes": [
+        "missing_output"
+      ]
+    },
+    {
+      "id": "small-business-ai",
+      "type": "商业分析",
+      "old": null,
+      "new": null,
+      "notes": [
+        "missing_output"
+      ]
+    },
+    {
+      "id": "night-shift-story",
+      "type": "故事",
+      "old": null,
+      "new": null,
+      "notes": [
+        "missing_output"
+      ]
+    },
+    {
+      "id": "sleep-science",
+      "type": "知识科普",
+      "old": null,
+      "new": null,
+      "notes": [
+        "missing_output"
+      ]
+    },
+    {
+      "id": "course-conversion",
+      "type": "转化",
+      "old": null,
+      "new": null,
+      "notes": [
+        "missing_output"
+      ]
+    },
+    {
+      "id": "city-observation",
+      "type": "城市观察",
+      "old": null,
+      "new": null,
+      "notes": [
+        "missing_output"
+      ]
+    },
+    {
+      "id": "career-choice",
+      "type": "观点",
+      "old": null,
+      "new": null,
+      "notes": [
+        "missing_output"
+      ]
+    }
+  ],
+  "regressions": [],
+  "boundary": "这些指标只测可确定的文本信号，不代表阅读量、完读率或内容优劣。"
+}

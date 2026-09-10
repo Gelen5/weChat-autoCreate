@@ -1,0 +1,14 @@
+[
+  {"id":"ai-product-update","type":"科技","prompt":"解释一个 AI 产品更新对普通创作者的实际影响"},
+  {"id":"creator-first-failure","type":"个人经历","prompt":"写一次内容创业失败及得到的具体教训"},
+  {"id":"middle-age-friendship","type":"情感","prompt":"中年人的友情为什么越来越少"},
+  {"id":"phone-review","type":"产品评测","prompt":"为普通用户判断两款手机谁更值得买"},
+  {"id":"wechat-layout-tutorial","type":"教程","prompt":"教新手完成微信公众号手机端排版"},
+  {"id":"platform-rule-comment","type":"热点评论","prompt":"评论一项刚发布的平台规则"},
+  {"id":"small-business-ai","type":"商业分析","prompt":"小企业使用 AI 的真实收益与成本"},
+  {"id":"night-shift-story","type":"故事","prompt":"写一个夜班便利店店员的故事"},
+  {"id":"sleep-science","type":"知识科普","prompt":"解释睡眠债是否真的能补回来"},
+  {"id":"course-conversion","type":"转化","prompt":"为一门内容创作课写可信的转化文章"},
+  {"id":"city-observation","type":"城市观察","prompt":"从一家老店关闭观察街区变化"},
+  {"id":"career-choice","type":"观点","prompt":"普通人是否应该裸辞做自由职业"}
+]

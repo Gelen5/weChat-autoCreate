@@ -11,6 +11,8 @@ from typing import Dict, Any, List, Optional, Tuple
 import markdown
 from bs4 import BeautifulSoup, NavigableString
 
+from .leaf import wrap_cjk_leaf
+
 logger = logging.getLogger(__name__)
 
 # ── 容器语法定义 ──
@@ -98,8 +100,10 @@ class MarkdownConverter:
         # Step 11: 暗黑模式
         result = self._step11_dark_mode(result)
 
-        # Step 12: CSS随机扰动
-        result = self._step12_css_random_perturbation(result)
+        # Step 12: CSS perturbation is opt-in. Random layout changes reduce
+        # reproducibility and have no evidence-backed recommendation benefit.
+        if self.theme.get("css_perturbation", False):
+            result = self._step12_css_random_perturbation(result)
 
         # Step 13: AIGC声明
         result = self._step13_aigc_declaration(result)
@@ -112,6 +116,9 @@ class MarkdownConverter:
 
         # Step 16: 包装
         result = self._step16_wrap(result)
+
+        # Final deterministic WeChat DOM preservation.
+        result = wrap_cjk_leaf(result)
 
         return result
 
@@ -456,7 +463,7 @@ class MarkdownConverter:
     # ── Step 12: CSS随机扰动 ──
 
     def _step12_css_random_perturbation(self, html: str) -> str:
-        """CSS随机扰动 - 避免被微信判定为模板"""
+        """Apply optional spacing variation for a user-requested visual treatment."""
         def perturb_style(match):
             style = match.group(1)
             # 随机微调margin

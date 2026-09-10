@@ -48,6 +48,11 @@ class RecommendationQualityTests(unittest.TestCase):
         report = check_generated_asset("missing-generated-image.png")
         self.assertTrue(report["blocked"])
 
+    def test_negated_advice_with_yiding_is_not_an_unsupported_fact(self):
+        body = "选择工具时不要因为别人推荐，就觉得自己一定要买。先看真实需求和预算，再做决定。" * 4
+        report = check_content("选择工具前先看需求", body)
+        self.assertNotIn("unsupported_claim", [item["code"] for item in report["findings"]])
+
 
 if __name__ == "__main__":
     unittest.main()

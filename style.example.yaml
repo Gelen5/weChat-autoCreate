@@ -4,6 +4,9 @@
 # 默认人格（对应 personas/ 目录下的YAML文件名）
 default_persona: "warm-editor"
 
+# 默认关闭随机 CSS，确保预览、复制和发布结果可复现。
+css_perturbation: false
+
 # 语气参数
 tone:
   formality: "casual"           # formal / semi-formal / casual

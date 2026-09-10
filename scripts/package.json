@@ -1,6 +1,6 @@
 {
   "name": "wechat-publisher-scripts",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "微信公众号全链路自动化 - TypeScript脚本",
   "private": true,
   "scripts": {

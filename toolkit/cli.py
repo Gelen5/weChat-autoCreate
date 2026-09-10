@@ -364,6 +364,80 @@ def cmd_recommendation_check(args):
     return 1 if final_report["blocked"] else 0
 
 
+def cmd_article_init(args):
+    from .article_state import save_article_state
+    from .article_workflow import new_article_state
+    state = new_article_state(args.request, mode=args.mode, topic=args.topic or "",
+                              audience=args.audience or "", goal=args.goal or "", timely=args.timely)
+    save_article_state(state, args.state)
+    print(f"ArticleState 已创建: {args.state}")
+    return 0
+
+
+def _article_run(args, only_node=None):
+    from .article_state import load_article_state, save_article_state
+    from .article_workflow import WorkflowBlocked, run_node, run_until_wait
+    state = load_article_state(args.state)
+    try:
+        if only_node:
+            run_node(state, only_node, output_dir=getattr(args, "output_dir", None))
+        else:
+            run_until_wait(state, output_dir=getattr(args, "output_dir", None))
+    except WorkflowBlocked as exc:
+        save_article_state(state, args.state)
+        print(json.dumps({"status": "blocked", "reason": str(exc), "state": args.state}, ensure_ascii=False, indent=2), file=sys.stderr)
+        return 1
+    save_article_state(state, args.state)
+    waiting = [name for name, item in state.nodes.items() if item.status == "awaiting_host"]
+    print(json.dumps({"state": args.state, "awaiting_host": waiting,
+                      "request": state.nodes[waiting[0]].request if waiting else None}, ensure_ascii=False, indent=2))
+    return 2 if waiting else 0
+
+
+def cmd_article_run(args):
+    return _article_run(args)
+
+
+def cmd_article_step(args):
+    return _article_run(args, args.node)
+
+
+def cmd_article_status(args):
+    from .article_state import load_article_state
+    state = load_article_state(args.state)
+    print(json.dumps({
+        "task_id": state.task_id,
+        "nodes": {name: {"status": item.status, "message": item.message} for name, item in state.nodes.items()},
+        "degradations": state.degradations,
+        "formatted_output": state.formatted_output,
+    }, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_article_resume(args):
+    from .article_state import load_article_state, save_article_state
+    from .article_workflow import apply_host_result
+    state = load_article_state(args.state)
+    with open(args.result, "r", encoding="utf-8") as handle:
+        result = json.load(handle)
+    apply_host_result(state, args.node, result)
+    save_article_state(state, args.state)
+    print(f"宿主结果已合并: {args.node} -> {args.state}")
+    return 0
+
+
+def cmd_benchmark(args):
+    from .benchmark import compare_directories, load_tasks
+    tasks = load_tasks(args.tasks)
+    report = compare_directories(tasks, args.old_dir, args.new_dir)
+    payload = json.dumps(report, ensure_ascii=False, indent=2)
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as handle:
+            handle.write(payload)
+    print(payload)
+    return 1 if report["regressions"] else 0
+
+
 def cmd_learn_theme(args):
     """从URL学习排版主题"""
     # 调用learn_theme脚本
@@ -488,6 +562,36 @@ def main():
     recommendation_parser.add_argument("--strict", action="store_true", help="将需修改项视为阻断")
     recommendation_parser.add_argument("--repair-output", help="生成保守修复稿并自动复检；不会编造事实或来源")
 
+    article_parser = subparsers.add_parser("article", help="2.0 长文结构化状态机")
+    article_sub = article_parser.add_subparsers(dest="article_command", required=True)
+    article_init = article_sub.add_parser("init", help="从用户请求创建 ArticleState")
+    article_init.add_argument("request", help="用户原始写作请求")
+    article_init.add_argument("--state", default="article-state.json")
+    article_init.add_argument("--mode", choices=["auto", "interactive", "step"], default="interactive")
+    article_init.add_argument("--topic")
+    article_init.add_argument("--audience")
+    article_init.add_argument("--goal")
+    article_init.add_argument("--timely", action="store_true")
+    article_run = article_sub.add_parser("run", help="运行到完成、阻塞或需要宿主模型")
+    article_run.add_argument("state")
+    article_run.add_argument("--output-dir")
+    article_step = article_sub.add_parser("step", help="运行指定节点")
+    article_step.add_argument("state")
+    article_step.add_argument("node", choices=["intent", "topic", "research", "strategy", "draft", "review", "delivery"])
+    article_step.add_argument("--output-dir")
+    article_status = article_sub.add_parser("status", help="查看节点状态与显式降级")
+    article_status.add_argument("state")
+    article_resume = article_sub.add_parser("resume", help="合并宿主模型 JSON 结果")
+    article_resume.add_argument("state")
+    article_resume.add_argument("node", choices=["intent", "topic", "research", "strategy", "draft", "review", "delivery"])
+    article_resume.add_argument("result", help="符合节点输出契约的 JSON 文件")
+
+    benchmark_parser = subparsers.add_parser("benchmark", help="比较旧版与新版固定任务输出")
+    benchmark_parser.add_argument("--tasks", default="tests/benchmarks/tasks.json")
+    benchmark_parser.add_argument("--old-dir", required=True)
+    benchmark_parser.add_argument("--new-dir", required=True)
+    benchmark_parser.add_argument("--output", "-o")
+
     # themes
     themes_parser = subparsers.add_parser("themes", help="列出可用主题")
 
@@ -512,7 +616,18 @@ def main():
         "learn-theme": cmd_learn_theme,
         "brief": cmd_brief,
         "recommendation-check": cmd_recommendation_check,
+        "benchmark": cmd_benchmark,
     }
+
+    if args.command == "article":
+        article_handlers = {
+            "init": cmd_article_init,
+            "run": cmd_article_run,
+            "step": cmd_article_step,
+            "status": cmd_article_status,
+            "resume": cmd_article_resume,
+        }
+        return article_handlers[args.article_command](args)
 
     if args.command == "tie-tu":
         tie_tu_handlers = {

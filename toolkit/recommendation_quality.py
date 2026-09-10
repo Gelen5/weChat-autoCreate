@@ -145,7 +145,9 @@ def check_content(title: str, body: str, *, sources: SourceLedger | Iterable[Sou
     scores["title_match"] = round(title_match * 100)
     if title and text and title_match < 0.18:
         findings.append(_finding("title_content_mismatch", "revision", "标题中的核心承诺在正文中没有明显对应内容", "标题/正文", "让正文首段回答标题问题，或缩小标题承诺。"))
-    factual_terms = ("数据显示", "研究表明", "专家表示", "调查发现", "官方发布", "致癌", "能治", "一定")
+    # A modal such as 一定 also appears in negated advice (不要…一定要).
+    # It is not by itself an empirical claim requiring a source ledger.
+    factual_terms = ("数据显示", "研究表明", "专家表示", "调查发现", "官方发布", "致癌", "能治")
     if any(term in text for term in factual_terms) and not records:
         findings.append(_finding("unsupported_claim", "block", "正文包含事实性或健康功效断言，但没有来源账本", "正文", "补充来源并核对结论；无法核验时改为观点或删除。"))
     elif records and any(record.status not in {"verified", "illustrative"} for record in records):
