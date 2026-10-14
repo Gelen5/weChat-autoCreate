@@ -87,6 +87,57 @@ class ArticleWorkflowTests(unittest.TestCase):
         self.assertIn('<span leaf="">中文标题</span>', rendered)
         self.assertEqual(wrap_cjk_leaf(rendered), rendered)
 
+    def test_search_goal_requests_question_and_answer(self):
+        state = new_article_state("解释本地旧店变化", audience="本地读者", goal="获取搜一搜搜索流量")
+        run_until_wait(state)
+        self.assertTrue(state.intent["search_intent"]["enabled"])
+        request = state.nodes["topic"].request
+        self.assertIn("search_intent", request["output_contract"])
+        self.assertIn("references/seo-rules.md", request["read"])
+        apply_host_result(state, "topic", {"angle": "旧店关闭原因", "search_intent": {"enabled": True, "query": "旧店为什么关闭", "expected_answer": "客流和租金变化"}})
+        self.assertEqual(state.intent["search_intent"]["query"], "旧店为什么关闭")
+
+    def test_search_topic_cannot_pass_without_answer_plan(self):
+        state = new_article_state("旧店为什么关闭", audience="本地读者", goal="搜一搜流量")
+        state.nodes["intent"].status = "passed"
+        state.angle = "解释街区变化"
+        run_node(state, "topic")
+        self.assertEqual(state.nodes["topic"].status, "awaiting_host")
+
+    def test_host_intent_keeps_configured_quality_inputs(self):
+        state = new_article_state("解释街区变化")
+        state.intent["history_dir"] = "C:/published"
+        state.intent["asset_base_dir"] = "C:/assets"
+        apply_host_result(state, "intent", {"intent": {"goal": "搜一搜搜索流量", "search_intent": {"enabled": True}}, "audience": {"description": "本地读者"}})
+        self.assertEqual(state.intent["history_dir"], "C:/published")
+        self.assertEqual(state.intent["asset_base_dir"], "C:/assets")
+        self.assertTrue(state.intent["search_intent"]["enabled"])
+
+    def test_review_uses_configured_history_and_delivery_checks_image(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history = root / "history"
+            history.mkdir()
+            body = "2026年观察三处街区，访谈3位店主，分别记录客流、租金和搬迁原因。" * 5
+            (history / "old.md").write_text(body, encoding="utf-8")
+            state = new_article_state("街区变化", audience="本地读者", goal="说明")
+            state.intent["history_dir"] = str(history)
+            state.selected_title = "街区变化"
+            state.draft = body
+            for name in ("intent", "topic", "research", "strategy", "draft"):
+                state.nodes[name].status = "passed"
+            with self.assertRaises(WorkflowBlocked):
+                run_node(state, "review")
+            self.assertIn("near_duplicate", [item["code"] for item in state.quality_report["hard_gate"]["findings"]])
+
+            state.intent.pop("history_dir")
+            state.nodes["review"].status = "passed"
+            state.draft = body + "\n\n![示意图](missing.png)"
+            with self.assertRaises(WorkflowBlocked):
+                run_node(state, "delivery", output_dir=root)
+            self.assertIn("missing_asset", [item["code"] for item in state.quality_report["hard_gate"]["findings"]])
+            self.assertFalse((root / "article.html").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

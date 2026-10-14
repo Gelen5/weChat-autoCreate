@@ -118,7 +118,8 @@ def _finish(report: dict[str, Any], strict: bool) -> dict[str, Any]:
 def check_content(title: str, body: str, *, sources: SourceLedger | Iterable[SourceRecord] | None = None,
                   history_dir: str | Path | None = None, kind: str = "article",
                   assets: Sequence[str | Path] | None = None, ai_assisted: bool | None = None,
-                  strict: bool = False) -> dict[str, Any]:
+                  strict: bool = False, search_intent: Mapping[str, Any] | None = None,
+                  local_links: Sequence[str | Path] | None = None) -> dict[str, Any]:
     text, title = str(body or "").strip(), str(title or "").strip()
     sentences = [item.strip() for item in _SENTENCE_SPLIT.split(text) if item.strip()]
     records = _records(sources)
@@ -145,6 +146,25 @@ def check_content(title: str, body: str, *, sources: SourceLedger | Iterable[Sou
     scores["title_match"] = round(title_match * 100)
     if title and text and title_match < 0.18:
         findings.append(_finding("title_content_mismatch", "revision", "标题中的核心承诺在正文中没有明显对应内容", "标题/正文", "让正文首段回答标题问题，或缩小标题承诺。"))
+    if kind == "article":
+        prose = re.sub(r"```[\s\S]*?```|`[^`\n]+`", "", text)
+        if re.search(r"<[^>]+\bstyle\s*=\s*[\"'][^\"']*(?:display\s*:\s*none|visibility\s*:\s*hidden|opacity\s*:\s*0(?:[;\"'\s]|$)|font-size\s*:\s*0(?:px)?(?:[;\"'\s]|$))", prose, re.I):
+            findings.append(_finding("hidden_text", "block", "正文含隐藏文字样式", "正文/HTML", "删除隐藏文字及无意义字符，保留读者可见的信息。"))
+        if re.search(r"(?P<term>[\u4e00-\u9fff]{2,8})(?:[，,、\s]*(?P=term)){3,}", prose):
+            findings.append(_finding("keyword_stuffing", "revision", "发现连续重复的词句，疑似关键词堆砌", "正文", "删去重复词句，只保留自然表达。"))
+        gate_pattern = r"(?:想看|获取|查看|了解)(?:完整|全部|具体|后续|详细)?(?:内容|答案|方法|步骤|名单|结果|信息)[^。！？\n]{0,45}(?:请|先|必须|需要)(?:关注|私信|加微信|添加微信|扫码|付费|点击阅读原文)"
+        if re.search(gate_pattern, prose):
+            findings.append(_finding("answer_gated", "revision", "正文把关键答案放在关注、私信、付费或跳转之后", "正文", "在文章内交付标题承诺的完整核心信息；延伸服务另行说明。"))
+        if re.search(r"(?:官方|唯一|登录|报名|下载)(?:入口|通道|链接)", title) and re.search(r"(?:并非|不是|非官方|仅供参考|无法提供|没有)(?:.{0,12})(?:入口|通道|链接|服务)", prose[:400]):
+            findings.append(_finding("misleading_entry_title", "revision", "标题承诺入口或服务，正文却表示无法提供", "标题/正文", "删除误导性入口表述，准确说明文章实际提供的信息。"))
+        if search_intent and search_intent.get("enabled"):
+            query = str(search_intent.get("query", "")).strip()
+            if not query:
+                findings.append(_finding("search_question_missing", "note", "搜索目标未记录读者的具体问题，无法核查答案是否完整", "搜索意图", "在选题节点记录真实读者问题，并人工核对正文答案。"))
+            image_count = len(re.findall(r"!\[[^\]]*\]\([^)]+\)", text))
+            visible_text = re.sub(r"!\[[^\]]*\]\([^)]+\)|<[^>]+>|[#*`_\[\]()]", "", text)
+            if image_count >= 3 and len(_clean(visible_text)) < 120:
+                findings.append(_finding("image_only_search_page", "revision", "图片为主但缺少足够的文字说明，读者难以快速理解内容", "正文/图片", "为图片补充具体说明和主要结论，不重复堆砌关键词。"))
     # A modal such as 一定 also appears in negated advice (不要…一定要).
     # It is not by itself an empirical claim requiring a source ledger.
     factual_terms = ("数据显示", "研究表明", "专家表示", "调查发现", "官方发布", "致癌", "能治")
@@ -168,11 +188,20 @@ def check_content(title: str, body: str, *, sources: SourceLedger | Iterable[Sou
             findings.append(_finding("homogeneous_content", "revision", f"与历史内容相似度较高：{best[1]}（{best[0]:.0%}）", "全文/标题", "补充新的事实、案例或判断，并删除重复结构。"))
     else:
         findings.append(_finding("history_unavailable", "note", "未配置本地历史内容，无法证明与过往文章不重复", "历史索引", "配置 history_dir 或提供已发布内容索引。"))
+    asset_info = {"coverage": "not_checked", "checked": 0}
     if assets is not None:
         asset_report = check_assets(assets)
         scores["asset_quality"] = asset_report["score"]
         findings.extend(asset_report["findings"])
+        asset_info = {"coverage": "local", "checked": len(assets)}
+    link_info = {"coverage": "not_checked", "checked": 0}
+    if local_links is not None:
+        for path in local_links:
+            if not Path(path).exists():
+                findings.append(_finding("missing_local_link", "revision", f"本地链接不存在：{path}", str(path), "修正链接目标或移除该链接。"))
+        link_info = {"coverage": "local", "checked": len(local_links)}
     report = {"kind": kind, "scores": scores, "findings": findings, "history": history_info,
+              "assets": asset_info, "links": link_info,
               "disclaimer": "本报告仅表示检查范围内未发现明显阻断项，不等同于微信官方推荐或审核结果。"}
     return _finish(report, strict)
 
@@ -242,7 +271,7 @@ def repair_content(title: str, body: str, report: Mapping[str, Any]) -> dict[str
 def check_article_file(path: str | Path, *, history_dir: str | Path | None = None, strict: bool = False) -> dict[str, Any]:
     source = read_text(path)
     title = source.splitlines()[0].lstrip("# ").strip() if source else Path(path).stem
-    body, ai_assisted, ledger = source, None, SourceLedger()
+    body, ai_assisted, ledger, search_intent = source, None, SourceLedger(), None
     if source.startswith("---"):
         parts = source.split("---", 2)
         if len(parts) == 3:
@@ -250,6 +279,8 @@ def check_article_file(path: str | Path, *, history_dir: str | Path | None = Non
                 import yaml
                 meta = yaml.safe_load(parts[1]) or {}
                 title, ai_assisted = str(meta.get("title", title)), meta.get("ai_assisted")
+                if isinstance(meta.get("search_intent"), Mapping):
+                    search_intent = meta["search_intent"]
                 raw_sources = meta.get("sources", [])
                 if isinstance(raw_sources, str):
                     raw_sources = [raw_sources]
@@ -263,4 +294,13 @@ def check_article_file(path: str | Path, *, history_dir: str | Path | None = Non
             body = parts[2]
     for index, url in enumerate(re.findall(r"https?://[^\s)\]>]+", body), 1):
         ledger.add(SourceRecord(f"body-url-{index}", kind="web", url=url, status="unverified"))
-    return check_content(title, body, sources=ledger, history_dir=history_dir, ai_assisted=ai_assisted, strict=strict)
+    image_refs = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", body)
+    image_refs += re.findall(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", body, re.I)
+    local_assets = [Path(path).parent / ref.split("#", 1)[0].split("?", 1)[0]
+                    for ref in image_refs if ref.strip() and not re.match(r"^(?:https?:|data:|//)", ref.strip(), re.I)]
+    link_refs = re.findall(r"(?<!!)\[[^\]]+\]\(([^)]+)\)", body)
+    local_links = [Path(path).parent / ref.split("#", 1)[0].split("?", 1)[0]
+                   for ref in link_refs if ref.strip() and not re.match(r"^(?:https?:|mailto:|tel:|#|//)", ref.strip(), re.I)]
+    return check_content(title, body, sources=ledger, history_dir=history_dir, assets=local_assets or None,
+                         local_links=local_links or None, ai_assisted=ai_assisted,
+                         search_intent=search_intent, strict=strict)

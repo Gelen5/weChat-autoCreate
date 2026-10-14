@@ -369,6 +369,10 @@ def cmd_article_init(args):
     from .article_workflow import new_article_state
     state = new_article_state(args.request, mode=args.mode, topic=args.topic or "",
                               audience=args.audience or "", goal=args.goal or "", timely=args.timely)
+    if args.history_dir:
+        state.intent["history_dir"] = str(Path(args.history_dir).resolve())
+    if args.asset_base_dir:
+        state.intent["asset_base_dir"] = str(Path(args.asset_base_dir).resolve())
     save_article_state(state, args.state)
     print(f"ArticleState 已创建: {args.state}")
     return 0
@@ -572,6 +576,8 @@ def main():
     article_init.add_argument("--audience")
     article_init.add_argument("--goal")
     article_init.add_argument("--timely", action="store_true")
+    article_init.add_argument("--history-dir", help="本账号已发布文章目录，用于本地重复度检查")
+    article_init.add_argument("--asset-base-dir", help="正文相对图片和本地链接的根目录")
     article_run = article_sub.add_parser("run", help="运行到完成、阻塞或需要宿主模型")
     article_run.add_argument("state")
     article_run.add_argument("--output-dir")

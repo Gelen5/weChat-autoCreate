@@ -34,6 +34,8 @@ def new_article_state(user_request: str, *, mode: str = "interactive", topic: st
         state.audience = {"description": audience.strip(), "status": "user_provided"}
     if goal:
         state.intent["goal"] = goal.strip()
+        if any(word in goal.lower() for word in ("搜索", "搜一搜", "seo")):
+            state.intent["search_intent"] = {"enabled": True}
     state.intent["timeliness"] = "time_sensitive" if timely else "evergreen_or_unspecified"
     state.log("created", "ArticleState initialized")
     return state
@@ -45,7 +47,7 @@ def _host_request(state: ArticleState, node: str, purpose: str, output_contract:
     item.message = purpose
     item.request = {
         "purpose": purpose,
-        "read": NODE_REFERENCES[node],
+        "read": NODE_REFERENCES[node] + (["references/seo-rules.md"] if state.intent.get("search_intent", {}).get("enabled") and node in {"topic", "strategy", "review"} else []),
         "state_fields": _relevant_state(state, node),
         "output_contract": output_contract,
         "rules": [
@@ -88,6 +90,46 @@ def _block(state: ArticleState, node: str, message: str) -> None:
     raise WorkflowBlocked(message)
 
 
+def _local_assets(state: ArticleState, base_dir: str | Path | None = None) -> list[Path] | None:
+    paths: list[Path] = []
+    image_refs = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", state.draft)
+    image_refs += re.findall(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", state.draft, re.I)
+    image_refs += [str(item["path"]) for item in state.visual_plan if item.get("path")]
+    root = Path(state.intent.get("asset_base_dir") or base_dir) if state.intent.get("asset_base_dir") or base_dir else None
+    for raw in image_refs:
+        ref = raw.strip().split("#", 1)[0].split("?", 1)[0]
+        if not ref or re.match(r"^(?:https?:|data:|//)", ref, re.I):
+            continue
+        path = Path(ref)
+        if path.is_absolute():
+            paths.append(path)
+        elif root is not None:
+            paths.append(root / path)
+    return paths or None
+
+
+def _local_links(state: ArticleState, base_dir: str | Path | None = None) -> list[Path] | None:
+    root = Path(state.intent.get("asset_base_dir") or base_dir) if state.intent.get("asset_base_dir") or base_dir else None
+    if root is None:
+        return None
+    refs = re.findall(r"(?<!!)\[[^\]]+\]\(([^)]+)\)", state.draft)
+    paths = [root / ref.split("#", 1)[0].split("?", 1)[0] for ref in refs
+             if ref.strip() and not re.match(r"^(?:https?:|mailto:|tel:|#|//)", ref.strip(), re.I)]
+    return paths or None
+
+
+def _quality_report(state: ArticleState, *, base_dir: str | Path | None = None) -> Dict[str, Any]:
+    return check_content(
+        state.selected_title or state.topic, state.draft,
+        sources=state.evidence_pack.sources,
+        history_dir=state.intent.get("history_dir"),
+        assets=_local_assets(state, base_dir),
+        local_links=_local_links(state, base_dir),
+        search_intent=state.intent.get("search_intent"),
+        strict=True,
+    )
+
+
 def run_node(state: ArticleState, node: str, *, output_dir: str | Path | None = None) -> ArticleState:
     if node not in ARTICLE_NODES:
         raise ValueError(f"Unknown article node: {node}")
@@ -100,17 +142,19 @@ def run_node(state: ArticleState, node: str, *, output_dir: str | Path | None = 
         if not state.user_request:
             _block(state, node, "缺少用户请求")
         if not state.intent.get("goal") or not state.audience:
-            _host_request(state, node, "识别写作目的、读者、内容类型、时效和转化目标", {
-                "intent": "object", "audience": "object", "topic": "string", "assumptions": "array"
+            _host_request(state, node, "识别写作目的、读者、内容类型、时效和转化目标；仅当用户要求搜索流量时，在 intent.search_intent 中设 enabled=true", {
+                "intent": "object with optional search_intent: {enabled, query, expected_answer}", "audience": "object", "topic": "string", "assumptions": "array"
             })
         else:
             state.topic = state.topic or state.user_request
             _finish(state, node, "意图与受众已结构化")
     elif node == "topic":
-        if not state.angle:
-            _host_request(state, node, "选择具体、有素材支撑且符合作者资格的文章角度", {
-                "topic": "string", "angle": "string", "title_candidates": "array<object>"
-            })
+        search = state.intent.get("search_intent", {})
+        if not state.angle or (search.get("enabled") and (not search.get("query") or not search.get("expected_answer"))):
+            contract = {"topic": "string", "angle": "string", "title_candidates": "array<object>"}
+            if state.intent.get("search_intent", {}).get("enabled"):
+                contract["search_intent"] = "object with enabled=true, query=reader question, expected_answer=answer article can provide"
+            _host_request(state, node, "选择具体、有素材支撑且符合作者资格的文章角度；有搜索目标时记录读者问题与可交付答案", contract)
         else:
             _finish(state, node, "主题与角度已确定")
     elif node == "research":
@@ -144,14 +188,13 @@ def run_node(state: ArticleState, node: str, *, output_dir: str | Path | None = 
             _finish(state, node, "正文第一稿已生成")
     elif node == "review":
         from .content_quality import assess_soft_quality
-        sources = state.evidence_pack.sources
-        report = check_content(state.selected_title or state.topic, state.draft, sources=sources, strict=True)
+        report = _quality_report(state)
         state.quality_report = {"hard_gate": report, "soft_quality": assess_soft_quality(state)}
         if report["blocked"]:
             state.revision_plan = [{"source": "hard_gate", "finding": finding} for finding in report["findings"]]
             _block(state, node, "正文硬门禁未通过")
         if not state.reader_simulation:
-            _host_request(state, node, "模拟目标读者、知情者、怀疑者和快速浏览者，输出局部修订计划", {
+            _host_request(state, node, "模拟目标读者、知情者、怀疑者和快速浏览者；有搜索目标时核对正文是否直接、完整回答问题，输出局部修订计划", {
                 "reader_simulation": "array<object>", "revision_plan": "array<object>", "revised_draft": "optional markdown string"
             })
         else:
@@ -162,6 +205,11 @@ def run_node(state: ArticleState, node: str, *, output_dir: str | Path | None = 
             state.visual_plan = [{"role": "cover", "purpose": "呈现标题的核心信息增量", "required": True}]
         if not output_dir:
             _block(state, node, "交付节点需要 output_dir")
+        report = _quality_report(state, base_dir=output_dir)
+        state.quality_report["hard_gate"] = report
+        if report["blocked"]:
+            state.revision_plan = [{"source": "hard_gate", "finding": finding} for finding in report["findings"]]
+            _block(state, node, "交付前质量门禁未通过")
         target_dir = Path(output_dir)
         target_dir.mkdir(parents=True, exist_ok=True)
         markdown_path = target_dir / "article.md"
@@ -179,7 +227,7 @@ def apply_host_result(state: ArticleState, node: str, result: Dict[str, Any]) ->
         raise ValueError(f"Unknown article node: {node}")
     allowed = {
         "intent": ("intent", "audience", "topic"),
-        "topic": ("topic", "angle", "title_candidates"),
+        "topic": ("topic", "angle", "title_candidates", "search_intent"),
         "research": ("evidence_pack",),
         "strategy": ("outline", "writing_strategy", "selected_title"),
         "draft": ("draft", "selected_title"),
@@ -192,6 +240,10 @@ def apply_host_result(state: ArticleState, node: str, result: Dict[str, Any]) ->
         value = result[key]
         if key == "revised_draft":
             state.draft = value
+        elif key == "intent":
+            state.intent.update(value)
+        elif key == "search_intent":
+            state.intent["search_intent"] = value
         elif key == "evidence_pack":
             from .article_state import ArticleState as _State
             payload = state.to_dict()

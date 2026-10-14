@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from toolkit.contracts import SourceLedger, SourceRecord
-from toolkit.recommendation_quality import check_content, check_generated_asset, repair_content
+from toolkit.recommendation_quality import check_article_file, check_content, check_generated_asset, repair_content
 
 
 class RecommendationQualityTests(unittest.TestCase):
@@ -52,6 +52,51 @@ class RecommendationQualityTests(unittest.TestCase):
         body = "选择工具时不要因为别人推荐，就觉得自己一定要买。先看真实需求和预算，再做决定。" * 4
         report = check_content("选择工具前先看需求", body)
         self.assertNotIn("unsupported_claim", [item["code"] for item in report["findings"]])
+
+    def test_search_specific_image_text_check_is_opt_in(self):
+        body = "![一](https://example.com/1.png)\n![二](https://example.com/2.png)\n![三](https://example.com/3.png)\n三张步骤图。"
+        ordinary = check_content("步骤图", body)
+        search = check_content("步骤图", body, search_intent={"enabled": True, "query": "怎么操作"})
+        self.assertNotIn("image_only_search_page", [item["code"] for item in ordinary["findings"]])
+        self.assertIn("image_only_search_page", [item["code"] for item in search["findings"]])
+
+    def test_hidden_text_and_keyword_stuffing_are_located(self):
+        report = check_content("本地服务", '<span style="display:none">隐藏词</span> 深圳搬家深圳搬家深圳搬家深圳搬家')
+        self.assertTrue(report["blocked"])
+        self.assertIn("hidden_text", [item["code"] for item in report["findings"]])
+        self.assertIn("keyword_stuffing", [item["code"] for item in report["findings"]])
+
+    def test_gated_answer_and_fake_entry_are_flagged(self):
+        report = check_content("官方报名入口", "本文不是官方报名入口。想看完整名单请关注公众号，我们会私信发送。")
+        codes = [item["code"] for item in report["findings"]]
+        self.assertIn("misleading_entry_title", codes)
+        self.assertIn("answer_gated", codes)
+
+    def test_unchecked_assets_are_reported(self):
+        report = check_content("观察", "2026年观察三处街区。")
+        self.assertEqual(report["assets"]["coverage"], "not_checked")
+
+    def test_css_example_does_not_trigger_hidden_text(self):
+        report = check_content("CSS教程", "```html\n<span style=\"display:none\">例子</span>\n```\n这里解释这段代码的用途。")
+        self.assertNotIn("hidden_text", [item["code"] for item in report["findings"]])
+
+    def test_markdown_import_checks_search_intent_and_missing_image(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            article = Path(temp_dir) / "article.md"
+            article.write_text('---\ntitle: "步骤图"\nsearch_intent:\n  enabled: true\n  query: "怎么操作"\n---\n![一](missing.png)\n![二](https://example.com/2.png)\n![三](https://example.com/3.png)\n三张步骤图。', encoding="utf-8")
+            report = check_article_file(article, strict=True)
+            codes = [item["code"] for item in report["findings"]]
+            self.assertIn("image_only_search_page", codes)
+            self.assertIn("missing_asset", codes)
+            self.assertEqual(report["assets"]["checked"], 1)
+
+    def test_markdown_import_checks_local_link_without_fetching_remote(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            article = Path(temp_dir) / "article.md"
+            article.write_text("# 操作说明\n\n[本地附件](missing.pdf) 与 [官方说明](https://example.com/guide)。", encoding="utf-8")
+            report = check_article_file(article, strict=True)
+            self.assertIn("missing_local_link", [item["code"] for item in report["findings"]])
+            self.assertEqual(report["links"]["checked"], 1)
 
 
 if __name__ == "__main__":

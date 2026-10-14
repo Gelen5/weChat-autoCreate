@@ -13,4 +13,6 @@ python -m toolkit.cli article resume article-state.json intent intent-result.jso
 python -m toolkit.cli article status article-state.json
 ```
 
+需要搜索获客时用 `--goal "搜一搜搜索流量"`；选题节点会要求返回 `search_intent.query` 和 `search_intent.expected_answer`。可选 `--history-dir "已发布文章目录"` 和 `--asset-base-dir "素材目录"`，使复核读取本地历史文章、图片和链接。没有配置时报告会明确写出未检查范围。
+
 退出码：`0` 完成，`1` 阻塞或失败，`2` 等待宿主模型结构化结果。
